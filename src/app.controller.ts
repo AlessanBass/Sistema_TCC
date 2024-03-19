@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Get, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Post, Render, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { AppService } from './app.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { join } from 'path';
@@ -11,9 +11,10 @@ export class AppController {
     private readonly fileService: FileService
     ) {}
 
+  @Render('index')
   @Get()
-  getHello() {
-    return this.appService.getHello();
+  index() {
+    return {msg: "Mensagem passada com handlebras"}
   }
 
   @UseInterceptors(FileInterceptor('file'))
