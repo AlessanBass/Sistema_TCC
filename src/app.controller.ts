@@ -1,12 +1,15 @@
-import { Controller, Get, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { AppService } from './app.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { join } from 'path';
-import { writeFile } from 'fs/promises';
+import { FileService } from './file/file.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly fileService: FileService
+    ) {}
 
   @Get()
   getHello() {
@@ -17,8 +20,14 @@ export class AppController {
   @Post()
   async upload(@UploadedFile() file: Express.Multer.File){
      const path = join(__dirname, '..', 'storage', file.originalname);
-     writeFile(path, file.buffer);
-     this.appService.readExecel(file, path);
 
+     try{
+      this.fileService.upload(file, path);
+     }catch(e){
+      throw new BadRequestException("Erro ao salvar arquivo!");
+     }
+
+     this.fileService.readExecel(file, path);
+    
   }
 }
