@@ -1,7 +1,12 @@
+{{> header}}
 
-    {{> header}}
+<h1>Página de upload do excel</h1>
+<form action="/uploadExel" method="post" enctype="multipart/form-data">
+    <label for="excel_file">Selecione o arquivo Excel:</label><br>
+    <input type="file" id="excel_file" name="file" accept=".xls,.xlsx"><br>
+    <button type="submit">Enviar</button>
+</form>
 
-    <h1>Página de upload do excel</h1>
-    <p>{{msg}}</p>
 </body>
+
 </html>

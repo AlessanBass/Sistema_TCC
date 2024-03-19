@@ -18,7 +18,7 @@ export class AppController {
   }
 
   @UseInterceptors(FileInterceptor('file'))
-  @Post()
+  @Post('uploadExel')
   async upload(@UploadedFile() file: Express.Multer.File){
      const path = join(__dirname, '..', 'storage', file.originalname);
 
