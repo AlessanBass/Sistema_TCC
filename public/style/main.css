@@ -1,0 +1,68 @@
+main {
+     /* border: 2px solid blue; */
+    margin-top: 20px;
+    padding: 10px;
+    width: 50%;
+    margin: 20px auto 20px auto;
+}
+
+form {
+    /* border: 1px solid red; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 10px;
+    box-shadow: 0px 0px 8px black;
+    border-radius: 20px;
+    background-color: white;
+}
+
+input {
+    padding: 10px;
+    margin-bottom:10px ;
+    font-size: 1.2em;
+}
+
+
+.custom-file-input::file-selector-button {
+    background-color: blue;
+    color: white;
+    padding: 6px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 20px;
+}
+.label-form{
+    background-color: orange;
+    color: white;
+    padding: 10px;
+    border-radius: 20px;
+    font-size: 1.6em;
+    text-transform: uppercase;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.p-form{
+    font-size: 1.1em;
+    margin-bottom: 20px;
+    color: rgb(85, 84, 84);
+    
+}
+
+.button-form{
+    padding: 5px 20px 5px 20px;
+    margin-bottom: 10px;
+    border: none;
+    font-size: 1.2em;
+    border-radius: 20px;
+    background-color: green;
+    color: white;
+}
+
+.button-form:hover{
+    box-shadow: 0px 0px 8px black;
+    background-color: rgb(7, 75, 7);
+}

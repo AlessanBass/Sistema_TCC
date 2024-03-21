@@ -1,0 +1,21 @@
+@media screen and (max-width: 765px) {
+    main {
+       width: 80%;
+   }
+   
+}
+
+@media screen and (max-width: 470px) {
+    main {
+       width: 100%;
+   }
+   
+}
+
+@media screen and (max-width: 396px) {
+   form{
+    /* flex-wrap: nowrap; */
+    font-size: 0.7em;
+   }
+   
+}
