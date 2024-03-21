@@ -10,6 +10,9 @@ header{
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+
+    position: sticky; /* Torna o header sticky */
+    top: 0; /* Fixa o header no topo da janela de visualização */
 }
 
 .logo-header{
