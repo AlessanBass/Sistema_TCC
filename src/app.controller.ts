@@ -3,7 +3,6 @@ import { AppService } from './app.service';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { join } from 'path';
 import { FileService } from './file/file.service';
-import { Response } from 'express';
 
 @Controller('/')
 export class AppController {
@@ -14,13 +13,11 @@ export class AppController {
 
   @Get()
   @Render('index')
-  index() {
-    return {msg: "Mensagem passada com handlebras"}
-  }
+  index() {}
 
   @Get('sobrenos')
   @Render('sobrenos')
-  sobre_nos(@Res() res: Response ){}
+  sobre_nos( ){}
 
   @UseInterceptors(FileInterceptor('file'))
   @Post('uploadExel')

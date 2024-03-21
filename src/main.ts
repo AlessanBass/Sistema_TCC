@@ -10,23 +10,10 @@ async function bootstrap() {
 
   // Configuração para visualizações (views)
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
-  app.setViewEngine('hbs');
+  app.setViewEngine('ejs');
 
   // Configuração para arquivos estáticos
   app.useStaticAssets(join(__dirname, '..', 'public'));
-
-  // Configuração para Handlebars partials
-  const hbs = exphbs.create({
-    extname: '.hbs',
-    defaultLayout: 'index',
-    layoutsDir: join(__dirname, '..', 'views'),
-    partialsDir: [
-      join(__dirname, '..', 'views/partials'),
-    ]
-  });
-
-  app.engine('hbs', hbs.engine);
-
 
   await app.listen(3000);
 }
