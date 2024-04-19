@@ -7,6 +7,7 @@ import style from '@/styles/menuLateral.module.css'
 import Main from './Main';
 import { TablePagination } from '@mui/material';
 import TableProfessor from './TableProfessor';
+import axios from 'axios'
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -41,11 +42,32 @@ function a11yProps(index: number) {
   };
 }
 
+
+
 export default function MenuLateral() {
   const [value, setValue] = React.useState(0);
+  const [professor, setProfessor] = React.useState(null);
+  const [area, setArea] = React.useState<any[]>();
 
+  React.useEffect(()=>{
+    const fetchData = async() =>{
+      try{
+        const response1 = await axios.get("http://localhost:3000/professor");
+        const response2 = await axios.get("http://localhost:3000/area");
+        setProfessor(response1.data);
+        setArea(response2.data);
+      }catch(e){
+        console.log(e)
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  // voltar
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
+    console.log("Cliquei aqiu: " + newValue);
   };
 
   return (
@@ -65,29 +87,18 @@ export default function MenuLateral() {
           sx={{ borderRight: 1, borderColor: 'divider' }}
 
         >
-          <Tab label="Computação" {...a11yProps(0)} className={`${style.tab}`} />
-          <Tab label="Eng. Civil" {...a11yProps(1)} className={`${style.tab}`} />
-          <Tab label="Eng. de Produção" {...a11yProps(2)} className={`${style.tab}`} />
-          <Tab label="Eng. Mecânica" {...a11yProps(3)} className={`${style.tab}`} />
-          <Tab label="Eng. Química" {...a11yProps(4)} className={`${style.tab}`} />
+          
+          {area && area.map((area, index) => (
+            <Tab key={area.id_area} label={area.nome_area} {...a11yProps(area.id_area)} className={style.tab} />
+          ))}
         </Tabs>
         <div className={style.tabPanel}>
-          <TabPanel value={value} index={0}>
-              <TableProfessor />
-          </TabPanel>
+        {area && area.map((area, index) => (
+            <TabPanel key={index} value={value} index={area.id_area}>
+              {professor ? <TableProfessor professores={professor ?? []} /> : 'Loading...'}
+            </TabPanel>
+          ))}
         </div>
-        <TabPanel value={value} index={1}>
-          Item Two
-        </TabPanel>
-        <TabPanel value={value} index={2}>
-          Item Three
-        </TabPanel>
-        <TabPanel value={value} index={3}>
-          Item Three
-        </TabPanel>
-        <TabPanel value={value} index={4}>
-          Item Three
-        </TabPanel>
 
       </Box>
     </>

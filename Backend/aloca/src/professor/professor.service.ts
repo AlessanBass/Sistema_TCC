@@ -22,6 +22,27 @@ export class ProfessorService {
     }
   }
 
+  async findByArea(area: string){
+    const areaInt = parseInt(area);
+    try{
+      return this.prisma.professor.findMany({
+        include:{
+          area: true,
+          alocacao:{
+            include: {
+              disciplina:true
+            }
+          }
+        },
+        where:{
+          area_id_area:areaInt
+        }
+      });
+
+    }catch(e){
+      throw new BadRequestException("Erro ao buscar os professores");
+    }
+  }
   /* Fazer a páginação e colocar os atributos do WHERE */
   async findAll() {
     try{
@@ -37,7 +58,7 @@ export class ProfessorService {
         
       });
     }catch(e){
-      throw new BadRequestException("Erro ao buscar os professores")
+      throw new BadRequestException("Erro ao buscar os professores");
     }
   }
 

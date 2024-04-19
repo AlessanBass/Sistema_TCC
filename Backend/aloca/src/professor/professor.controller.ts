@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ProfessorService } from './professor.service';
 import { CreateProfessorDto } from './dto/create-professor.dto';
 import { UpdateProfessorDto } from './dto/update-professor.dto';
@@ -14,8 +14,13 @@ export class ProfessorController {
   }
 
   @Get()
-  findAll() {
-    return this.professorService.findAll();
+  findAll(@Query('area') area?: string) {
+    if(area){
+      return this.professorService.findByArea(area);
+    }else{
+      return this.professorService.findAll();
+    }
+    
   }
 
   @Get(':id')
