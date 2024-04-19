@@ -19,7 +19,15 @@ export class AreaService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} area`;
+    try{
+      return this.prisma.area.findFirst({
+        where:{
+          id_area: id
+        }
+      });
+    }catch(e){
+
+    }
   }
 
   update(id: number, updateAreaDto: UpdateAreaDto) {
