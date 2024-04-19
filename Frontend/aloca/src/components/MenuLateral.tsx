@@ -6,6 +6,8 @@ import Box from '@mui/material/Box';
 import style from '@/styles/menuLateral.module.css';
 import TableProfessor from './TableProfessor';
 import axios from 'axios'
+import ModalProfessorCreate from './ModalProfessorCreate';
+import Confirmacao from './Confirmacao';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -104,6 +106,8 @@ export default function MenuLateral() {
   return (
     <>
       <h2 className={`${style.titlePage}`}>Filtrar Professores por área</h2>
+      <ModalProfessorCreate/>
+      
       <Box
         sx={{ bgcolor: 'background.paper', display: 'flex' }}
         className={`${style.tabs}`} 
