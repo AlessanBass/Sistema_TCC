@@ -8,7 +8,8 @@ export class ProfessorController {
   constructor(private readonly professorService: ProfessorService) {}
 
   @Post()
-  create(@Body() createProfessorDto: CreateProfessorDto) {
+  async create(@Body() createProfessorDto: CreateProfessorDto) {
+    //console.log(createProfessorDto);
     return this.professorService.create(createProfessorDto);
   }
 
