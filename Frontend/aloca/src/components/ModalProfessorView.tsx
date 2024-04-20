@@ -10,19 +10,22 @@ import axios from 'axios';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { TextField, FormControl, InputLabel, MenuItem } from '@mui/material';
 import Confirmacao from './Confirmacao';
+import ViewProfessorInfo from './ViewProfessorInfo';
 
 const style = {
     position: 'absolute' as 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
+    width: '70%',
+    height: 400, // Definindo a altura máxima do modal como 400 pixels
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
+    overflowY: 'auto',
+    borderRadius: '10px',
 };
-
 interface Disciplina {
     id_disciplina: number;
     periodo: number;
@@ -100,7 +103,7 @@ export default function ModalProfessorView({ open, handleClose, acao, id_profess
                 <Fade in={open}>
                     <Box sx={style}>
                         <Typography id="transition-modal-title" variant="h6" component="h2" className={`${styles.titleModal}`}>
-                            {acao === 1 ? "Visualizando" : null}
+                            {acao === 1 ? <h2>Modo Visualização</h2> : null}
                             {acao === 2 ? "Editando" : null}
                             {acao === 3 ? "Deletando" : null}
                         </Typography>
@@ -113,22 +116,7 @@ export default function ModalProfessorView({ open, handleClose, acao, id_profess
                                 noValidate
                                 autoComplete="off"
                             >
-                                {acao === 1 && professor ? (
-                                    <div>
-                                        <h1>View</h1>
-                                        {professor.alocacao.length > 0 ? (
-                                            professor.alocacao.map((alocacao, index) => (
-                                                <div key={index}>
-                                                    <p>Observações do Colegiado: {alocacao.observacoes_colegiado}</p>
-                                                    <p>Disciplina: {alocacao.disciplina.nome_disciplina}</p>
-                                                    <hr />
-                                                </div>
-                                            ))
-                                        ) : (
-                                            <p>O professor ainda não possui disciplinas.</p>
-                                        )}
-                                    </div>
-                                ) : null}
+                                {acao === 1 && professor ? <ViewProfessorInfo professor={professor}/> : "Carregando..."}
                                 {acao === 2 ? <h1>Editando {id_professor}</h1> : null}
                                 {acao === 3 ? <h1>Delete {id_professor}</h1> : null}
 
