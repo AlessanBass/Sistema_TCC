@@ -12,7 +12,11 @@ export class AreaService {
 
   findAll() {
     try {
-      return this.prisma.area.findMany();
+      return this.prisma.area.findMany({
+        orderBy:{
+          nome_area: 'asc'
+        }
+      });
     } catch (error) {
       throw new BadRequestException("Erro ao solicitar areas");
     }

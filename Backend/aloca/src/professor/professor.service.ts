@@ -5,81 +5,84 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ProfessorService {
-  constructor( private readonly prisma: PrismaService){}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(createProfessorDto: CreateProfessorDto) {
     const id_area = parseInt(createProfessorDto.area_id_area);
-    try{
+    try {
       return this.prisma.professor.create({
-        data:{
+        data: {
           nome_professor: createProfessorDto.nomeProfessor,
           observacoes: createProfessorDto.observacoes,
           area_id_area: id_area
         }
       });
-    }catch(e){
+    } catch (e) {
       throw new BadRequestException("Erro ao inserir")
     }
   }
 
-  async findByArea(area: string){
+  async findByArea(area: string) {
     const areaInt = parseInt(area);
-    try{
+    try {
       return this.prisma.professor.findMany({
-        include:{
+        include: {
           area: true,
-          alocacao:{
+          alocacao: {
             include: {
-              disciplina:true
+              disciplina: true
             }
           }
         },
-        where:{
-          area_id_area:areaInt
+        where: {
+          area_id_area: areaInt
+        },
+        orderBy: {
+          nome_professor: 'asc' // Ordenar pelo nome do professor em ordem alfabética ascendente
         }
       });
 
-    }catch(e){
+    } catch (e) {
       throw new BadRequestException("Erro ao buscar os professores");
     }
   }
   /* Fazer a páginação e colocar os atributos do WHERE */
   async findAll() {
-    try{
+    try {
       return this.prisma.professor.findMany({
-        include:{
+        include: {
           area: true,
-          alocacao:{
+          alocacao: {
             include: {
-              disciplina:true
+              disciplina: true
             }
           }
         },
-        
+
       });
-    }catch(e){
+    } catch (e) {
       throw new BadRequestException("Erro ao buscar os professores");
     }
   }
 
   async findOne(id: number) {
-    if(await this.empity(id)){
+    if (await this.empity(id)) {
       throw new BadRequestException(`Erro ao procurar o professor com o ID ${id}}`);
     }
 
-    try{
+    try {
       return this.prisma.professor.findUnique({
-        include:{
+        include: {
           area: true,
-          alocacao:{
-            include:{
+          alocacao: {
+            include: {
               disciplina: true
             }
           }
         },
-        where:{id_professor: id }
+        where: { id_professor: id }
       });
-    }catch(e){
+    } catch (e) {
       throw new BadRequestException("Erro ao buscar os professores")
     }
   }
@@ -87,22 +90,22 @@ export class ProfessorService {
   async update(id: number, updateProfessorDto: UpdateProfessorDto) {
     const id_area = parseInt(updateProfessorDto.area_id_area);
 
-    if(await this.empity(id)){
+    if (await this.empity(id)) {
       throw new BadRequestException(`Erro ao atualizar o professor com o ID ${id}}`);
     }
 
-    try{
+    try {
       return this.prisma.professor.update({
-        data:{
+        data: {
           nome_professor: updateProfessorDto.nomeProfessor,
           observacoes: updateProfessorDto.observacoes,
           area_id_area: id_area
         },
-        where:{
-          id_professor:id
+        where: {
+          id_professor: id
         }
       });
-    }catch(e){
+    } catch (e) {
       throw new BadRequestException(`Erro ao atualizar o professor com o ID ${id}: ${e.message}`);
     }
 
@@ -110,13 +113,13 @@ export class ProfessorService {
 
   async remove(id: number) {
     /* Verifica se o professor tá na tabela de alocação */
-    if(await this.emptyAlocacao(id)){
+    if (await this.emptyAlocacao(id)) {
       // faço nada
-    }else{
+    } else {
       try {
         await this.prisma.alocacao.deleteMany({
-          where:{
-            professor_id_professor:id
+          where: {
+            professor_id_professor: id
           }
         });
       } catch (error) {
@@ -125,46 +128,46 @@ export class ProfessorService {
     }
 
     /* veriica se o professor existe */
-    if(await this.empity(id)){
+    if (await this.empity(id)) {
       throw new BadRequestException(`Erro ao deleter o professor com o ID ${id}`);
-    }else{
+    } else {
       return this.prisma.professor.delete({
-        where:{
-          id_professor:id
+        where: {
+          id_professor: id
         }
       })
     }
   }
 
-  async empity(id: number){
+  async empity(id: number) {
     const professor = await this.prisma.professor.findUnique({
-      where:{
-        id_professor:id
+      where: {
+        id_professor: id
       }
     });
     //console.log(professor);
 
-    if(professor === null || professor === undefined){
+    if (professor === null || professor === undefined) {
       return true;
-    }else{
+    } else {
       return false;
     }
   }
 
-  async emptyAlocacao(id: number){
+  async emptyAlocacao(id: number) {
     const alocacao = await this.prisma.alocacao.findFirst({
-      where:{
-        professor_id_professor:id
+      where: {
+        professor_id_professor: id
       }
     });
     //console.log(alocacao);
 
-    if(alocacao === null || alocacao === undefined){
+    if (alocacao === null || alocacao === undefined) {
       return true;
-    }else{
+    } else {
       return false;
     }
   }
 
-  
+
 }

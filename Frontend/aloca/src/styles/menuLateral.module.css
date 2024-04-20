@@ -27,3 +27,12 @@
     border-radius: 20px;
     box-shadow: 0px 0px 5px black;
 }
+
+.containerFiltro{
+    /* border: 1px solid red; */
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

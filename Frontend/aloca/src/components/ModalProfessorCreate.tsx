@@ -12,7 +12,6 @@ import { TextField, FormControl, InputLabel, MenuItem } from '@mui/material';
 import Confirmacao from './Confirmacao';
 
 
-
 const style = {
   position: 'absolute' as 'absolute',
   top: '50%',
@@ -73,6 +72,7 @@ export default function ModalProfessorCreate() {
         /*  onClose(); */
         setOpen(false);
         setOpenConfirmation(true);
+        location.reload();
 
         // Limpa os dados do formulário
         setNomeProfessor('');
@@ -182,7 +182,7 @@ export default function ModalProfessorCreate() {
           </Box>
         </Fade>
       </Modal>
-      <Confirmacao open={openConfirmation} setOpen={setOpenConfirmation} /> {/* Adicione o componente de confirmação */}
+      <Confirmacao open={openConfirmation} setOpen={setOpenConfirmation} description='Professor Cadastrado com Sucesso!'/> {/* Adicione o componente de confirmação */}
     </div>
   );
 }

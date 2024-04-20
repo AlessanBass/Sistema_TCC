@@ -23,3 +23,39 @@
     background-color: #cccccc;
     /* Cor quando o mouse passa por cima */
 }
+
+.containerAcoes{
+    /* border: 1px solid red; */
+    font-size: 1.2em;
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.iconAcoes{
+    margin-right: 10px;
+}
+
+.iconsAcoesGeral{
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.iconsAcoesGeral:hover{
+    cursor: pointer;
+    transform: scale(1.2);
+}
+
+.iconsEye{
+   color: rgb(31, 31, 252);
+}
+
+.iconsPen{
+    color: rgb(37, 189, 37);
+}
+
+.iconsTrash{
+    color: red;
+}

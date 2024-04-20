@@ -6,16 +6,10 @@ import IconButton from '@mui/material/IconButton';
 interface ConfirmacaoProps {
   open: boolean;
   setOpen: (value: boolean) => void;
+  description: string;
 }
 
-export default function Confirmacao({ open, setOpen }: ConfirmacaoProps) {
-  /* const [open, setOpen] = React.useState(true);
-
-  const handleClick = () => {
-    setOpen(true);
-  }; */
-/*   const [open, setOpenState] = React.useState(true);
- */
+export default function Confirmacao({ open, setOpen, description }: ConfirmacaoProps) {
 React.useEffect(() => {
   if (open) {
     const timer = setTimeout(() => {
@@ -48,12 +42,11 @@ React.useEffect(() => {
 
   return (
     <div>
-      {/* <Button onClick={handleClick}>Open Snackbar</Button> */}
       <Snackbar
         open={open}
         autoHideDuration={5000}
         onClose={handleClose}
-        message="Professor Cadastrado com Sucesso!"
+        message={description}
         action={action}
       />
     </div>
