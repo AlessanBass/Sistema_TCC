@@ -32,7 +32,11 @@ export default function TableProfessor({professores}: propsTable) {
                         <TableRow key={professor.id_professor} className={`${styles.tableRow}`}>
                             <TableCell>{professor.nome_professor}</TableCell>
                             <TableCell>{professor.observacoes}</TableCell>
-                            <TableCell>Em construção</TableCell>
+                            <TableCell>
+                                <i className='fa-solid fa-eye'></i>
+                                <i className='fa-solid fa-pen'></i>
+                                <i className='fa-solid fa-trash'></i>
+                            </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

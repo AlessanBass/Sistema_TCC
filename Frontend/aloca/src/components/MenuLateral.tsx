@@ -105,8 +105,10 @@ export default function MenuLateral() {
 
   return (
     <>
-      <h2 className={`${style.titlePage}`}>Filtrar Professores por área</h2>
-      <ModalProfessorCreate/>
+      <div className={`${style.containerFiltro}`}>
+        <h2 className={`${style.titlePage}`}>Filtrar Professores por área</h2>
+        <ModalProfessorCreate />
+      </div>
       
       <Box
         sx={{ bgcolor: 'background.paper', display: 'flex' }}

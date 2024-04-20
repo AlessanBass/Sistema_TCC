@@ -6,8 +6,11 @@ import Fade from '@mui/material/Fade';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import styles from '@/styles/modal.module.css'
-import FormCadastroProfessor from './FormCadastroProfessor';
 import axios from 'axios';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import { TextField, FormControl, InputLabel, MenuItem } from '@mui/material';
+import Confirmacao from './Confirmacao';
+
 
 
 const style = {
@@ -23,8 +26,8 @@ const style = {
 };
 
 interface Area {
-    id_area: number;
-    nome_area: string;
+  id_area: number;
+  nome_area: string;
 }
 
 export default function ModalProfessorCreate() {
@@ -32,15 +35,66 @@ export default function ModalProfessorCreate() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const [areas, setAreas] = React.useState<Area[]>([]);
+  /* Teste com o form */
+  const [nomeProfessor, setNomeProfessor] = React.useState('');
+  const [observacoes, setObservacoes] = React.useState('');
+  const [area_id_area, setArea] = React.useState('');
+  const [openConfirmation, setOpenConfirmation] = React.useState(false);
+
+  const handleNomeProfessorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNomeProfessor(event.target.value);
+  };
+
+  const handleObservacoesChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setObservacoes(event.target.value);
+  };
+
+  const handleAreaChange = (event: SelectChangeEvent) => {
+    setArea(event.target.value as string);
+  }
+
+  const handleSubmit = async () => {
+
+    if (!nomeProfessor || !area_id_area) {
+      alert('Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://localhost:3000/professor', {
+        nomeProfessor,
+        observacoes,
+        area_id_area,
+        // Inclua aqui outros campos conforme necessário
+      });
+
+      if (response.status === 201) {
+        /* alert('Cadastro realizado com sucesso!'); */
+        /*  onClose(); */
+        setOpen(false);
+        setOpenConfirmation(true);
+
+        // Limpa os dados do formulário
+        setNomeProfessor('');
+        setObservacoes('');
+        setArea('');
+
+      } else {
+        alert('Ocorreu um erro ao realizar o cadastro.');
+      }
+    } catch (error) {
+      console.error('Erro ao realizar o cadastro:', error);
+    }
+  };
   /* Buscando as áreas */
-  React.useEffect(()=>{
-    const fetchData = async() =>{
-      try{
+  React.useEffect(() => {
+    const fetchData = async () => {
+      try {
         const response = await axios.get<Area[]>("http://localhost:3000/area");
         setAreas(response.data);
         //console.log(areas)
 
-      }catch(e){
+      } catch (e) {
         console.log(e)
       }
     }
@@ -71,11 +125,64 @@ export default function ModalProfessorCreate() {
               Cadastro Professor
             </Typography>
             <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-              <FormCadastroProfessor areas={areas} onClose={handleClose}/>
+              <Box
+                component="form"
+                sx={{
+                  '& .MuiTextField-root': { m: 1, width: '100%', margin: '10px auto 10px auto' },
+                }}
+                noValidate
+                autoComplete="off"
+              >
+                <TextField
+                  required
+                  id="outlined-required"
+                  label="Nome Professor"
+                  name="nomeProfessor"
+                  value={nomeProfessor}
+                  onChange={handleNomeProfessorChange}
+                /*  sx={{ width: '100%',  }} */
+                />
+
+                <TextField
+                  id="outlined-required"
+                  label="Observações"
+                  name="observacoes"
+                  value={observacoes}
+                  onChange={handleObservacoesChange}
+                />
+
+                <FormControl sx={{
+                  width: '100%',
+                  margin: '10px auto 20px auto'
+                }} required>
+                  <InputLabel id="area-label">Área</InputLabel>
+                  <Select
+                    labelId="area-label"
+                    id="area"
+                    value={area_id_area}
+                    name='area_id_area'
+                    label="Área"
+                    onChange={handleAreaChange}
+                  >
+                    {areas.map((area) => (
+                      <MenuItem key={area.id_area} value={area.id_area}>
+                        {area.nome_area}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <Button variant="contained" color="primary" onClick={handleSubmit}>
+                  Cadastrar
+                </Button>
+
+                
+              </Box>
             </Typography>
           </Box>
         </Fade>
       </Modal>
+      <Confirmacao open={openConfirmation} setOpen={setOpenConfirmation} /> {/* Adicione o componente de confirmação */}
     </div>
   );
 }
