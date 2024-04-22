@@ -78,7 +78,7 @@ export default function TableViewProfessor({professores} :propsModal) {
                                 <TableCell>{alocacao.disciplina.qtd_creditos}</TableCell>
                                 <TableCell>{alocacao.disciplina.turma}</TableCell>
                             </TableRow>
-                        ))};
+                        ))}
                 </TableBody>
             </Table>
         </TableContainer>

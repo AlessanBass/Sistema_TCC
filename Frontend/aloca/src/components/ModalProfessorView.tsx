@@ -120,8 +120,8 @@ export default function ModalProfessorView({ open, handleClose, acao, id_profess
                                 {acao === 2 ? <h1>Editando {id_professor}</h1> : null}
                                 {acao === 3 ? <h1>Delete {id_professor}</h1> : null}
 
-                                <Button variant="contained" color="primary" >
-                                    Cadastrar
+                                <Button variant="contained" color="error" onClick={handleClose}>
+                                    Fechar
                                 </Button>
 
 
