@@ -59,7 +59,7 @@ export default function TableProfessor({professores}: propsTable) {
             <Table>
                 <TableHead >
                     <TableRow >
-                        <TableCell className={`${styles.tableHeader}`}>Professor</TableCell>
+                        <TableCell className={`${styles.tableHeader}`}>Professores</TableCell>
                         <TableCell className={`${styles.tableHeader}`}>Observações</TableCell>
                         <TableCell className={`${styles.tableHeader}`} >Ações</TableCell>
                     </TableRow> 

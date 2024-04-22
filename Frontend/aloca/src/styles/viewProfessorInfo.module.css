@@ -1,0 +1,39 @@
+.pInfo{
+    border-bottom: 1px solid rgb(8, 68, 117);
+    padding: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-family: "Oswald", sans-serif;
+    margin: 5px auto 5px auto;
+}
+
+.span{
+    font-weight: 400;
+    font-style: italic;
+}
+
+.containerInfoProfessor{
+ /*    border: 1px solid blue; */
+    padding: 10px;
+    /* width: 90%; */
+    margin: 0 auto;
+}
+
+.infoGerais{
+    font-family: "Oswald", sans-serif;
+    text-transform: uppercase;
+    text-align: center;
+    background-color: rgb(8, 68, 117);
+    color: white;
+    padding: 5px;
+    border-radius: 10px;
+    
+}
+
+.h2Diciplina{
+    margin: 20px auto 10px auto;
+}
+
+.infoSemDisciplina{
+    text-align: center;
+}

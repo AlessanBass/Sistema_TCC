@@ -1,3 +1,4 @@
+'use client'
 import * as React from 'react';
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
@@ -17,11 +18,12 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 400,
+  width: 600,
   bgcolor: 'background.paper',
   border: '2px solid #000',
   boxShadow: 24,
   p: 4,
+  borderRadius:'10px',
 };
 
 interface Area {
@@ -72,7 +74,7 @@ export default function ModalProfessorCreate() {
         /*  onClose(); */
         setOpen(false);
         setOpenConfirmation(true);
-        location.reload();
+        /* location.reload(); */
 
         // Limpa os dados do formulário
         setNomeProfessor('');
