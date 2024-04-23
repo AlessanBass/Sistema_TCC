@@ -9,6 +9,7 @@ import styles from '@/styles/table.module.css'
 import ModalProfessorView from './ModalProfessorView';
 import axios from 'axios';
 import Confirmacao from './Confirmacao';
+import ModalProfessorEdit from './ModalProfessorEdit';
 
 interface Professor {
     id_professor: number;
@@ -21,10 +22,13 @@ interface propsTable{
 }
 export default function TableProfessor({professores}: propsTable) {
     const [open, setOpen] = React.useState(false);
+    const [openModalEdit, setOpenModalEdit] = React.useState(false);
     const [acao, setAcao] = React.useState(Number);
     const [id_professor, setIdProfessor] = React.useState(Number);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const handleOpenEdit = () => setOpenModalEdit(true);
+    const handleCloseEdit = () => setOpenModalEdit(false);
     const [professoresList, setProfessoresList] = React.useState<Professor[]>(professores); 
     /* Para a confimação */
     const [openConfirmation, setOpenConfirmation] = React.useState(false);
@@ -33,13 +37,20 @@ export default function TableProfessor({professores}: propsTable) {
         //console.log(`Id do professor clicado: ${id_professor} | Acao: ${acao}`)
         if(acao === 3){
             deleteProfessor(+id_professor)
-        }else{
+        }
+        if(acao === 2){
+            setAcao(acao);
+            setIdProfessor(+id_professor);
+            handleOpenEdit();
+        }
+        if(acao === 1){
             setAcao(acao);
             setIdProfessor(+id_professor);
             handleOpen();
         }
        
     }
+
 
     const deleteProfessor = async (idProfessor: number) =>{
         try {
@@ -80,7 +91,9 @@ export default function TableProfessor({professores}: propsTable) {
                     ))}
                 </TableBody>
             </Table>
+            
             <ModalProfessorView open={open} handleClose={handleClose} acao={acao} id_professor={id_professor}/>
+            <ModalProfessorEdit openModalEdit={openModalEdit} handleCloseEdit={handleCloseEdit} acao={acao} id_professor={id_professor} />
             <Confirmacao open={openConfirmation} setOpen={setOpenConfirmation} description='Professor Deletado com Sucesso!'/>
         </TableContainer>
 

@@ -83,6 +83,7 @@ export default function MenuLateral() {
     fetchData();
   }, []);
 
+  
   // voltar
   const handleChange = async (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
