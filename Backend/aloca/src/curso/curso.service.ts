@@ -8,8 +8,7 @@ import { throwError } from 'rxjs';
 export class CursoService {
   constructor(private readonly prisma: PrismaService) { }
 
-  create(createCursoDto: CreateCursoDto) {
-    console.log(createCursoDto.nomeCurso);
+  async create(createCursoDto: CreateCursoDto) {
     try {
       /* Falta verificar se já existe um curso com esse nome */
 
@@ -26,7 +25,11 @@ export class CursoService {
 
   async findAll() {
     try {
-      return this.prisma.curso.findMany();
+      return this.prisma.curso.findMany({
+        orderBy:{
+          nome_curso: 'asc'
+        }
+      });
     } catch (e) {
       throw new BadRequestException("Erro ao buscar os cursos");
     }
@@ -37,8 +40,6 @@ export class CursoService {
       const curso = await this.prisma.curso.findUnique({
         where: { id_curso: id }
       });
-
-      console.log(curso);
 
       if (!curso) {
         throw new NotFoundException(`Curso com id ${id} não encontrado`);
