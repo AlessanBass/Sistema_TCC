@@ -6,7 +6,7 @@
     padding: 5px 10px 5px 10px;
     font-size: 1.2em;
     transition: background-color 0.5s ease-in-out; /* Adiciona uma transição suave */
-    animation: pulse 6s infinite; /* Adiciona a animação pulse */
+    /* animation: pulse 6s infinite; */ /* Adiciona a animação pulse */
 }
 
 .buttonModal:hover {
@@ -48,4 +48,11 @@
     width: 100%;
     box-shadow: 0px 0px 8px black;
     /* border: 1px solid red; */
+}
+
+/* Mudei de posição */
+.buttonModal{
+    margin: 20px auto 20px 70px;
+    background-color: rgb(10, 182, 10);
+    font-size: 1em;
 }

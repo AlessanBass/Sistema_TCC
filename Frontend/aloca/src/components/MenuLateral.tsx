@@ -108,7 +108,7 @@ export default function MenuLateral() {
     <>
       <div className={`${style.containerFiltro}`}>
         <h2 className={`${style.titlePage}`}>Filtrar Professores por área</h2>
-        <ModalProfessorCreate />
+       {/*  <ModalProfessorCreate /> */}
       </div>
       
       <Box
@@ -139,6 +139,7 @@ export default function MenuLateral() {
         </div>
 
       </Box>
+      <ModalProfessorCreate />
     </>
   );
 }
