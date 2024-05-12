@@ -5,7 +5,7 @@ import { UpdateCursoDto } from './dto/update-curso.dto';
 
 @Controller('curso')
 export class CursoController {
-  constructor(private readonly cursoService: CursoService) {}
+  constructor(private readonly cursoService: CursoService) { }
 
   @Post()
   create(@Body() createCursoDto: CreateCursoDto) {
@@ -13,17 +13,22 @@ export class CursoController {
   }
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.cursoService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     return this.cursoService.findOne(+id);
   }
 
+  @Get('nome/:nomeCurso')
+  async findByNome(@Param('nomeCurso') nome: string) {
+    return this.cursoService.findByNome(nome);
+  }
+
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCursoDto: UpdateCursoDto) {
+  async update(@Param('id') id: string, @Body() updateCursoDto: UpdateCursoDto) {
     return this.cursoService.update(+id, updateCursoDto);
   }
 

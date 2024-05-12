@@ -6,9 +6,12 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AreaModule } from './area/area.module';
 import { OfertaModule } from './oferta/oferta.module';
 import { CursoModule } from './curso/curso.module';
+import { SemestreModule } from './semestre/semestre.module';
+import { DisciplinaModule } from './disciplina/disciplina.module';
+import { AlocacaoModule } from './alocacao/alocacao.module';
 
 @Module({
-  imports: [ProfessorModule, PrismaModule, AreaModule, OfertaModule, CursoModule],
+  imports: [ProfessorModule, PrismaModule, AreaModule, OfertaModule, CursoModule, SemestreModule, DisciplinaModule, AlocacaoModule],
   controllers: [AppController],
   providers: [AppService],
 })
