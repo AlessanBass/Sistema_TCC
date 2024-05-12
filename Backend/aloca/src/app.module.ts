@@ -7,9 +7,10 @@ import { AreaModule } from './area/area.module';
 import { OfertaModule } from './oferta/oferta.module';
 import { CursoModule } from './curso/curso.module';
 import { SemestreModule } from './semestre/semestre.module';
+import { DisciplinaModule } from './disciplina/disciplina.module';
 
 @Module({
-  imports: [ProfessorModule, PrismaModule, AreaModule, OfertaModule, CursoModule, SemestreModule],
+  imports: [ProfessorModule, PrismaModule, AreaModule, OfertaModule, CursoModule, SemestreModule, DisciplinaModule],
   controllers: [AppController],
   providers: [AppService],
 })
