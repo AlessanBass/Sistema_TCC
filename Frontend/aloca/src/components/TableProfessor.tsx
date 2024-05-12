@@ -77,9 +77,9 @@ export default function TableProfessor({professores}: propsTable) {
                 </TableHead>
                 <TableBody>
                     {professores && professores.map((professor) =>(
-                        <TableRow key={professor.id_professor} className={`${styles.tableRow}`}>
-                            <TableCell>{professor.nome_professor}</TableCell>
-                            <TableCell>{professor.observacoes}</TableCell>
+                        <TableRow key={professor.id_professor} className={`${styles.tableRow}`} >
+                            <TableCell sx={{ fontFamily: '"Oswald", sans-serif', fontSize:'1em'  }}>{professor.nome_professor}</TableCell>
+                            <TableCell sx={{ fontFamily: '"Oswald", sans-serif', fontSize:'1em' }}>{professor.observacoes}</TableCell>
                             <TableCell>
                                 <div className={`${styles.containerAcoes}`}>
                                     <i onClick={() => handleClick(professor.id_professor, 1)}  className={`fa-solid fa-eye ${styles.iconAcoes} ${styles.iconsAcoesGeral} ${styles.iconsEye}`}></i>
