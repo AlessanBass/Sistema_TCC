@@ -3,6 +3,7 @@ import { CreateCursoDto } from './dto/create-curso.dto';
 import { UpdateCursoDto } from './dto/update-curso.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { throwError } from 'rxjs';
+import { serialize } from 'v8';
 
 @Injectable()
 export class CursoService {
@@ -74,6 +75,29 @@ export class CursoService {
     
   }
 
+ 
+  async getContains(search:string){
+    try{
+      const curso = await this.prisma.curso.findMany({
+        where: {
+          nome_curso:{
+            contains:search
+          }
+        },
+      });
+
+      /* Posso retornar um array vazio para indicar que não existe esse curso ainda */
+
+     /*  if(curso.length === 0){
+        throw new NotFoundException("Não existe curso com essse nome");
+      } */
+
+      return curso;
+
+    }catch(e){
+      throw new NotFoundException("Erro ao buscar curso por esse nome");
+    }
+  }
 
   async update(id: number, updateCursoDto: UpdateCursoDto) {
   /*verificar se o curso existe  */

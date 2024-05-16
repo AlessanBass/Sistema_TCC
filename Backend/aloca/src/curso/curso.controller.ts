@@ -27,6 +27,11 @@ export class CursoController {
     return this.cursoService.findByNome(nome);
   }
 
+  @Get('search/:search')
+  async getContains(@Param('search') search: string){
+    return this.cursoService.getContains(search);
+  }
+
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateCursoDto: UpdateCursoDto) {
     return this.cursoService.update(+id, updateCursoDto);

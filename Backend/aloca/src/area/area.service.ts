@@ -125,4 +125,27 @@ export class AreaService {
     }
 
   }
+
+  async getContains(search:string){
+    try{
+      const curso = await this.prisma.area.findMany({
+        where: {
+          nome_area:{
+            contains:search
+          }
+        },
+      });
+
+      /* Posso retornar um array vazio para indicar que não existe esse curso ainda */
+
+     /*  if(curso.length === 0){
+        throw new NotFoundException("Não existe curso com essse nome");
+      } */
+
+      return curso;
+
+    }catch(e){
+      throw new NotFoundException("Erro ao buscar area por esse nome");
+    }
+  }
 }

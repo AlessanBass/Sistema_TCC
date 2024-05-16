@@ -22,6 +22,16 @@ export class AreaController {
     return this.areaService.findOne(+id);
   }
 
+  @Get('name/:name')
+  async findByName(@Param('name') name:string){
+    return this.areaService.findByNome(name);
+  }
+
+  @Get('search/:search')
+  async getContains(@Param('search') search: string){
+    return this.areaService.getContains(search);
+  }
+
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateAreaDto: UpdateAreaDto) {
     return this.areaService.update(+id, updateAreaDto);
