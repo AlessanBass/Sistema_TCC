@@ -12,14 +12,20 @@ export class OfertaController {
   @UseInterceptors(FileInterceptor('file'))
   @Post('uploadOferta')
   async create(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('Nenhum arquivo enviado');
+    }
+    
     const path = join(__dirname, '..', '..', 'storage', file.originalname);
 
-    try {
-      this.ofertaService.upload(file, path);
-    } catch (e) {
-      throw new BadRequestException("Erro ao salvar arquivo!");
-    }
-    this.ofertaService.readExecel(file, path);
+     try {
+      const saveFile =  await this.ofertaService.upload(file, path);
+      if(saveFile){
+        return await this.ofertaService.readExecel(file, path);
+      }
+     } catch (e) {
+      throw new BadRequestException("Controller: Erro ao salvar arquivo!");
+    } 
   }
 
  /*  @Get()

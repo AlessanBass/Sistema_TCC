@@ -1,22 +1,50 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import * as ExcelJS from 'exceljs';
-import { writeFile } from 'fs/promises';
+import { unlink, writeFile } from 'fs/promises';
+import { AreaService } from 'src/area/area.service';
+import { CursoService } from 'src/curso/curso.service';
+import { DisciplinaService } from 'src/disciplina/disciplina.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+
+//Interface Disicplina
+interface Disicplina {
+  periodo: number;
+  cod: string;
+  nome_disciplina: string;
+  carga_horaria: number;
+  qtd_creditos: number;
+  turma: string;
+  curso_id_curso: number;
+  area_id_area: number;
+}
 
 @Injectable()
 export class OfertaService {
+  constructor(
+    private readonly _disciplina: DisciplinaService,
+    private readonly _prisma: PrismaService,
+    private readonly _area: AreaService,
+    private readonly _curso: CursoService
 
-  upload(file: Express.Multer.File, path: string): boolean {
+  ) { }
+
+  async upload(file: Express.Multer.File, path: string): Promise<boolean> {
     try {
-      writeFile(path, file.buffer);
+      await writeFile(path, file.buffer);
       return true;
     } catch (e) {
-      throw new BadRequestException("Erro ao salvar arquivo"); 
+      throw new BadRequestException("Service: Erro ao salvar arquivo");
     }
   }
 
   async readExecel(file: Express.Multer.File, path: string) {
+    await this.upload(file, path); /* Espera escrever o */
     const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.readFile(path);
+    try {
+      await workbook.xlsx.readFile(path);
+    } catch (error) {
+      throw new BadRequestException('Erro ao ler o arquivo Excel: ' + error.message);
+    }
 
     // Obtendo a primeira planilha
     const sheet = workbook.getWorksheet(1);
@@ -43,36 +71,79 @@ export class OfertaService {
       data.push(rowData);
     });
 
-    // Agora 'data' contém todos os dados da planilha
-    /* console.log(data.column2); */
-    data.forEach(item => {
-      if(item.column1 === undefined || item.column1 === 0){
-        /* console.log("Não tem professor"); */
-      } else {
-        console.log(item);
+    await this.excelDataProcessing(data);
+    /* Jogar essa isso de apagar em uma função */
+    try {
+      await unlink(path);
+      console.log('Arquivo excluído com sucesso');
+    } catch (error) {
+      console.error('Erro ao excluir o arquivo:', error);
+    }
+  }
+
+  async excelDataProcessing(data: any[]) {
+    console.log(`tamanho de data ${data.length}`);
+    for (let i = 1; i < data.length; i++) {
+      const item = data[i];
+      /* 
+        1° Verificar se curso/area existem -> OK
+        2° Verificar a existência da disciplina -> OK
+
+        OBS: Alterar o meu banco de dados -> Disciplina pode ter
+           várias turmas 
+       */
+      let area = await this.findArea(item);
+      let curso = await this.findCurso(item);
+      let disciplina = await this.findDisciplina(item);
+      console.log(disciplina);
+
+
+
+    }
+  };
+
+  async findArea(item: any) {
+    let areaExcel = item.column9.split(' ');
+    if (areaExcel.length >= 2) {
+      let area = await this._area.getContains(areaExcel[1]);
+      if (area.length >= 1) {
+        /* console.log(`Area Composta: ${area[0].nome_area}`); */
+        return area[0];
       }
-    });
- 
+    } else {
+      let area = await this._area.findByNome(areaExcel[0]);
+      if (area.length >= 1) {
+        /* console.log(`Area Simples: ${area[0].nome_area}`); */
+        return area[0];
+      }
+    }
   }
 
-
-  /* create(createOfertaDto: CreateOfertaDto) {
-    return 'Acessei aqui na rota';
+  async findCurso(item: any) {
+    /* console.log(item.column8); */
+    let cursoExcel = item.column8.split(' ');
+    if (cursoExcel.length >= 2) {
+      let curso = await this._curso.getContains(cursoExcel[1]);
+      if (curso.length >= 1) {
+        /* console.log(`curso Composta: ${curso[0].nome_curso}`); */
+        return curso[0];
+      }
+    } else {
+      let curso = await this._curso.findByNome(cursoExcel[0]);
+      if (curso.length >= 1) {
+        /* console.log(`curso Simples: ${curso[0].nome_curso}`); */
+        return curso[0];
+      }
+    }
   }
 
-  findAll() {
-    return `This action returns all oferta`;
+  async findDisciplina(item: any) {
+    /* vou buscar pelo código da disciplina */
+    let disciplina = await this._disciplina.findOneCod(item.column2);
+    if (disciplina == null || disciplina === undefined) {
+      return null;
+    } else {
+      return disciplina;
+    }
   }
-
-  findOne(id: number) {
-    return `This action returns a #${id} oferta`;
-  }
-
-  update(id: number, updateOfertaDto: UpdateOfertaDto) {
-    return `This action updates a #${id} oferta`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} oferta`;
-  } */
 }
