@@ -2,6 +2,7 @@ import { BadRequestException, ConflictException, Injectable, InternalServerError
 import { CreateTurmaDto } from './dto/create-turma.dto';
 import { UpdateTurmaDto } from './dto/update-turma.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { isNullOrUndefined } from 'util';
 
 @Injectable()
 export class TurmaService {
@@ -98,4 +99,20 @@ export class TurmaService {
       throw new NotFoundException("Erro ao deletar turma");
     }
   }
+
+  async findOneName(name: string) {
+    const turma = await this.prisma.turma.findFirst({
+      where: {
+        nome_turma: name
+      }
+    });
+
+    if (!turma) {
+      /* throw new NotFoundException("Turma não encontrada no banco de dados"); */
+      return null;
+    }
+
+    return turma;
+  }
+
 }

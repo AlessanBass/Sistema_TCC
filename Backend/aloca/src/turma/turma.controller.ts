@@ -22,6 +22,11 @@ export class TurmaController {
     return this.turmaService.findOne(+id);
   }
 
+  @Get('name/:name')
+  async findOneCod(@Param('name') name: string){
+    return this.turmaService.findOneName(name);
+  }
+
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateTurmaDto: UpdateTurmaDto) {
     return this.turmaService.update(+id, updateTurmaDto);
