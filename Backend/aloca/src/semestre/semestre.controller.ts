@@ -5,7 +5,7 @@ import { UpdateSemestreDto } from './dto/update-semestre.dto';
 
 @Controller('semestre')
 export class SemestreController {
-  constructor(private readonly semestreService: SemestreService) {}
+  constructor(private readonly semestreService: SemestreService) { }
 
   @Post()
   async create(@Body() createSemestreDto: CreateSemestreDto) {
@@ -17,6 +17,11 @@ export class SemestreController {
     return this.semestreService.findAll();
   }
 
+  @Get('lastest')
+  async lastest() {
+    return this.semestreService.findLatest();
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.semestreService.findOne(+id);
@@ -26,6 +31,9 @@ export class SemestreController {
   async findByNome(@Param('nomeSemestre') nome: string) {
     return this.semestreService.findByNome(nome);
   }
+
+  
+ 
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateSemestreDto: UpdateSemestreDto) {
