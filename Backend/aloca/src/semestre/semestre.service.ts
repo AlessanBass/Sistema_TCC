@@ -28,7 +28,7 @@ export class SemestreService {
   async findAll() {
     try {
       return this.prisma.semestre.findMany({
-        orderBy:{
+        orderBy: {
           nome_semestre: 'asc'
         }
       });
@@ -38,6 +38,7 @@ export class SemestreService {
   }
 
   async findOne(id: number) {
+    console.log("entrei nessa porra");
     try {
       const semestre = await this.prisma.semestre.findUnique({
         where: { id_semestre: id }
@@ -86,7 +87,7 @@ export class SemestreService {
 
     try {
       return this.prisma.semestre.delete({
-        where:{id_semestre:id}
+        where: { id_semestre: id }
       });
     } catch (e) {
       throw new NotFoundException("Erro ao deletar semestre");
@@ -94,7 +95,7 @@ export class SemestreService {
   }
 
   async findByNome(nome: string) {
-    try{
+    try {
       const semestre = await this.prisma.semestre.findMany({
         where: {
           nome_semestre: nome,
@@ -103,15 +104,33 @@ export class SemestreService {
 
       /* Posso retornar um array vazio para indicar que não existe esse curso ainda */
 
-     /*  if(curso.length === 0){
-        throw new NotFoundException("Não existe curso com essse nome");
-      } */
+      /*  if(curso.length === 0){
+         throw new NotFoundException("Não existe curso com essse nome");
+       } */
 
       return semestre;
 
-    }catch(e){
+    } catch (e) {
       throw new NotFoundException("Erro ao buscar curso por esse nome");
     }
-    
+
+  }
+
+  async findLatest() {
+    try {
+      const latestSemestre = await this.prisma.semestre.findFirst({
+        orderBy: {
+          id_semestre: 'desc',
+        },
+      });
+
+      if (!latestSemestre) {
+        throw new NotFoundException('Nenhum semestre encontrado');
+      }
+
+      return latestSemestre;
+    } catch (e) {
+      throw new InternalServerErrorException('Erro ao buscar o semestre mais recente');
+    }
   }
 }

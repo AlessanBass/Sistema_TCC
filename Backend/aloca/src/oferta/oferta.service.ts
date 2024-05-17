@@ -5,17 +5,18 @@ import { AreaService } from 'src/area/area.service';
 import { CursoService } from 'src/curso/curso.service';
 import { DisciplinaService } from 'src/disciplina/disciplina.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { TurmaService } from 'src/turma/turma.service';
 
 //Interface Disicplina
 interface Disicplina {
   periodo: number;
-  cod: string;
-  nome_disciplina: string;
-  carga_horaria: number;
-  qtd_creditos: number;
-  turma: string;
-  curso_id_curso: number;
-  area_id_area: number;
+	cod: string;
+	nome_disciplina: string;
+	carga_horaria: number;
+	qtd_creditos: number;
+	curso_id_curso: number;
+	area_id_area: number;
+	turma_id_turma: number;
 }
 
 @Injectable()
@@ -24,7 +25,8 @@ export class OfertaService {
     private readonly _disciplina: DisciplinaService,
     private readonly _prisma: PrismaService,
     private readonly _area: AreaService,
-    private readonly _curso: CursoService
+    private readonly _curso: CursoService,
+    private readonly _turma: TurmaService
 
   ) { }
 
@@ -82,7 +84,7 @@ export class OfertaService {
   }
 
   async excelDataProcessing(data: any[]) {
-    console.log(`tamanho de data ${data.length}`);
+    console.log(`Tamanho de data ${data.length}`);
     for (let i = 1; i < data.length; i++) {
       const item = data[i];
       /* 
@@ -90,14 +92,32 @@ export class OfertaService {
         2° Verificar a existência da disciplina -> OK
 
         OBS: Alterar o meu banco de dados -> Disciplina pode ter
-           várias turmas 
+           várias turmas -> OK
+
+        Verificar se não existe alocação repetida (alocação com o mesma turma para a mesma disciplina)
+
+        Não exigir que uma turma seja obrigatorio para criar uma nova
+         disciplina
+
+        OBS: Usar trim()  para remover espçaos em branco no incio/fim
+           de uma string
        */
+      let turma = await this.findTurma(item);
       let area = await this.findArea(item);
       let curso = await this.findCurso(item);
       let disciplina = await this.findDisciplina(item);
-      console.log(disciplina);
 
-
+      if(turma && area && curso && disciplina){
+        console.log(`A disciplina: ${disciplina.nome_disciplina} deve ser inserida em alocaocao`);
+      }else{
+        console.log(`A disciplina ainda nao: ${item.column3} deve ser inserida em alocaocao`);
+        console.log('Motivos:');
+        if(!turma){console.log('Turma não encontrada');}
+        if(!area){console.log('Area não encontrada');}
+        if(!curso){console.log('Curso não encontrada');}
+        if(!disciplina){console.log('Disciplina não encontrada');}
+        console.log('-----------------------------------------------');
+      }
 
     }
   };
@@ -120,18 +140,15 @@ export class OfertaService {
   }
 
   async findCurso(item: any) {
-    /* console.log(item.column8); */
     let cursoExcel = item.column8.split(' ');
     if (cursoExcel.length >= 2) {
       let curso = await this._curso.getContains(cursoExcel[1]);
       if (curso.length >= 1) {
-        /* console.log(`curso Composta: ${curso[0].nome_curso}`); */
         return curso[0];
       }
     } else {
       let curso = await this._curso.findByNome(cursoExcel[0]);
       if (curso.length >= 1) {
-        /* console.log(`curso Simples: ${curso[0].nome_curso}`); */
         return curso[0];
       }
     }
@@ -146,4 +163,11 @@ export class OfertaService {
       return disciplina;
     }
   }
+
+  async findTurma(item: any){ 
+    return await this._turma.findOneName(item.column6);
+  }
+
+  async saveAlocacao(){}
+  async createDisciplina(){}
 }
