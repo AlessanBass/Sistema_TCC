@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateProfessorDto } from './dto/create-professor.dto';
 import { UpdateProfessorDto } from './dto/update-professor.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -8,17 +8,22 @@ export class ProfessorService {
   constructor(private readonly prisma: PrismaService) { }
 
   async create(createProfessorDto: CreateProfessorDto) {
-    const id_area = parseInt(createProfessorDto.area_id_area);
+    const existingProfessor = await this.prisma.professor.findFirst({ where: { nome_professor: createProfessorDto.nomeProfessor } });
+    if (existingProfessor) {
+      throw new ConflictException('Já existe um professor com esse nome');
+    }
+
+    /* Cria um novo professor */
     try {
       return this.prisma.professor.create({
         data: {
           nome_professor: createProfessorDto.nomeProfessor,
           observacoes: createProfessorDto.observacoes,
-          area_id_area: id_area
-        }
+          area_id_area: (+createProfessorDto.area_id_area)
+        },
       });
-    } catch (e) {
-      throw new BadRequestException("Erro ao inserir")
+    } catch (error) {
+      throw new InternalServerErrorException('Erro ao criar professor');
     }
   }
 
@@ -88,26 +93,31 @@ export class ProfessorService {
   }
 
   async update(id: number, updateProfessorDto: UpdateProfessorDto) {
-    const id_area = parseInt(updateProfessorDto.area_id_area);
-
-    if (await this.empity(id)) {
-      throw new BadRequestException(`Erro ao atualizar o professor com o ID ${id}}`);
-    }
-
-    try {
-      return this.prisma.professor.update({
-        data: {
+     /* Verifica se a professor existe */
+     const professor = await this.prisma.professor.findUnique({ where: { id_professor: id } });
+     if (!professor) {
+       throw new NotFoundException("Professor não encontrada");
+     }
+ 
+     /* Verifica se já existe um professor com o novo nome */
+     const existingProfessor = await this.prisma.professor.findFirst({ where: { nome_professor: updateProfessorDto.nomeProfessor } });
+     if (existingProfessor && existingProfessor.id_professor !== id) {
+       throw new ConflictException("Já existe um professor com esse nome");
+     }
+ 
+     /* Atualiza o professor */
+     try {
+       return this.prisma.professor.update({
+         data: {
           nome_professor: updateProfessorDto.nomeProfessor,
           observacoes: updateProfessorDto.observacoes,
-          area_id_area: id_area
-        },
-        where: {
-          id_professor: id
-        }
-      });
-    } catch (e) {
-      throw new BadRequestException(`Erro ao atualizar o professor com o ID ${id}: ${e.message}`);
-    }
+          area_id_area: (+updateProfessorDto.area_id_area)
+         },
+         where: { id_professor: id }
+       });
+     } catch (e) {
+       throw new InternalServerErrorException("Erro ao atualizar professor");
+     }
 
   }
 

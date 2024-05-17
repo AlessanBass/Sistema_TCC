@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateSemestreDto } from './dto/create-semestre.dto';
 import { UpdateSemestreDto } from './dto/update-semestre.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -8,21 +8,20 @@ export class SemestreService {
   constructor(private readonly prisma: PrismaService) { }
 
   async create(createSemestreDto: CreateSemestreDto) {
-    const verificaNome = await this.findByNome(createSemestreDto.nomeSemestre);
-    if(verificaNome.length > 0){
-      throw new BadRequestException("Já existe semestre com esse nome!");
+    const existingSemestre = await this.prisma.semestre.findFirst({ where: { nome_semestre: createSemestreDto.nomeSemestre } });
+    if (existingSemestre) {
+      throw new ConflictException('Já existe um semestre com esse nome');
     }
 
+    /* Cria a nova turma */
     try {
-      /* Falta verificar se já existe um curso com esse nome */
-
       return this.prisma.semestre.create({
-        data:{
+        data: {
           nome_semestre: createSemestreDto.nomeSemestre,
-        }
+        },
       });
-    } catch (e) {
-      throw new BadRequestException("Erro ao cadastrar novo semestre");
+    } catch (error) {
+      throw new InternalServerErrorException('Erro ao criar um novo');
     }
   }
 
@@ -56,17 +55,28 @@ export class SemestreService {
   }
 
   async update(id: number, updateSemestreDto: UpdateSemestreDto) {
-    /* Verifica se o curso existe */
-    const semestre = await this.findOne(id);
+    /* Verifica se a turma existe */
+    const semestre = await this.prisma.semestre.findUnique({ where: { id_semestre: id } });
+    if (!semestre) {
+      throw new NotFoundException("Semestre não encontrada");
+    }
+
+    /* Verifica se já existe uma turma com o novo nome */
+    const existingSemestre = await this.prisma.semestre.findFirst({ where: { nome_semestre: updateSemestreDto.nomeSemestre } });
+    if (existingSemestre && existingSemestre.id_semestre !== id) {
+      throw new ConflictException("Já existe um semestre com esse nome");
+    }
+
+    /* Atualiza a turma */
     try {
       return this.prisma.semestre.update({
-        data:{
+        data: {
           nome_semestre: updateSemestreDto.nomeSemestre,
         },
-        where:{id_semestre: id}
+        where: { id_semestre: id }
       });
     } catch (e) {
-      throw new NotFoundException("Erro ao atualizar semestre");
+      throw new InternalServerErrorException("Erro ao atualizar semestre");
     }
   }
 
