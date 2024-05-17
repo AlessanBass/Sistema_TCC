@@ -8,7 +8,7 @@ export class CreateDisciplinaDto {
 	nome_disciplina: string;
 	carga_horaria: number;
 	qtd_creditos: number;
-	turma: string;
 	curso_id_curso: number;
 	area_id_area: number;
+	turma_id_turma: number;
 }

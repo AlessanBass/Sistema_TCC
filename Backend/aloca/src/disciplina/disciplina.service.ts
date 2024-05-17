@@ -16,9 +16,10 @@ export class DisciplinaService {
           nome_disciplina : createDisciplinaDto.nome_disciplina,
           carga_horaria : (+createDisciplinaDto.carga_horaria),
           qtd_creditos : (+createDisciplinaDto.qtd_creditos),
-          turma : createDisciplinaDto.turma,
           curso_id_curso :(+createDisciplinaDto.curso_id_curso),
-          area_id_area : (+createDisciplinaDto.area_id_area)
+          area_id_area : (+createDisciplinaDto.area_id_area),
+          turma_id_turma: (+createDisciplinaDto.turma_id_turma)
+
         }
       });
     } catch (e) {
@@ -76,8 +77,8 @@ export class DisciplinaService {
       if (updateDisciplinaDto.qtd_creditos !== undefined) {
         dataToUpdate.qtd_creditos = +updateDisciplinaDto.qtd_creditos;
       }
-      if (updateDisciplinaDto.turma !== undefined) {
-        dataToUpdate.turma = updateDisciplinaDto.turma;
+      if (updateDisciplinaDto.turma_id_turma !== undefined) {
+        dataToUpdate.turma = +updateDisciplinaDto.turma_id_turma;
       }
       if (updateDisciplinaDto.curso_id_curso !== undefined) {
         dataToUpdate.curso_id_curso = +updateDisciplinaDto.curso_id_curso;
