@@ -13,7 +13,7 @@ interface Oferta {
   obs_colegiados?: string | null;
   disciplina_id_disciplina: number;
   semestre_id_semestre: number;
-  curso_id_curso: number;
+  area_id_area: number;
 }
 
 interface Disicplina {
@@ -123,7 +123,7 @@ export class EnvioOfertaService {
           obs_colegiados: item.column12,
           disciplina_id_disciplina: disciplina.id_disciplina,
           semestre_id_semestre: semestre.id_semestre,
-          curso_id_curso: curso.id_curso,
+          area_id_area: area.id_area,
         }
         await this.createOferta(newOfeta);
       } else { /* Aqui eu crio uma disciplina */
@@ -169,7 +169,7 @@ export class EnvioOfertaService {
             obs_colegiados: item.column12,
             disciplina_id_disciplina: retorno.id_disciplina,
             semestre_id_semestre: semestre.id_semestre,
-            curso_id_curso: curso.id_curso,
+            area_id_area: retorno.area_id_area,
           }
           await this.createOferta(newOfeta);
         }

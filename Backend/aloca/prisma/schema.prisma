@@ -22,6 +22,7 @@ model area {
   id_area    Int          @id @unique(map: "id_area_UNIQUE") @default(autoincrement())
   nome_area  String       @db.VarChar(100)
   disciplina disciplina[]
+  oferta     oferta[]
   professor  professor[]
 }
 
@@ -30,7 +31,6 @@ model curso {
   nome_curso String       @db.VarChar(100)
   tipo_curso String       @db.VarChar(100)
   disciplina disciplina[]
-  oferta     oferta[]
 }
 
 model disciplina {
@@ -74,13 +74,13 @@ model oferta {
   obs_colegiado            String?    @db.VarChar(100)
   disciplina_id_disciplina Int
   semestre_id_semestre     Int
-  curso_id_curso           Int
+  area_id_area             Int
   alocacao                 alocacao[]
-  curso                    curso      @relation(fields: [curso_id_curso], references: [id_curso], onDelete: NoAction, onUpdate: NoAction, map: "fk_oferta_curso1")
+  area                     area       @relation(fields: [area_id_area], references: [id_area], onDelete: NoAction, onUpdate: NoAction, map: "fk_oferta_area1")
   disciplina               disciplina @relation(fields: [disciplina_id_disciplina], references: [id_disciplina], onDelete: NoAction, onUpdate: NoAction, map: "fk_oferta_disciplina1")
   semestre                 semestre   @relation(fields: [semestre_id_semestre], references: [id_semestre], onDelete: NoAction, onUpdate: NoAction, map: "fk_oferta_semestre1")
 
-  @@index([curso_id_curso], map: "fk_oferta_curso1_idx")
   @@index([disciplina_id_disciplina], map: "fk_oferta_disciplina1_idx")
   @@index([semestre_id_semestre], map: "fk_oferta_semestre1_idx")
+  @@index([area_id_area], map: "fk_oferta_area1_idx")
 }

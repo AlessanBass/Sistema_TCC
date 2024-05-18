@@ -15,7 +15,6 @@ export class EnvioOfertaController {
     }
     
     const path = join(__dirname, '..', '..', 'storage', file.originalname);
-
      try {
       const saveFile =  await this.envioOfertaService.upload(file, path);
       if(saveFile){
