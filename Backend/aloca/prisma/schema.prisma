@@ -10,6 +10,7 @@ datasource db {
 model alocacao {
   id_alocacao              Int        @id @unique(map: "id_alocacao_UNIQUE") @default(autoincrement())
   observacoes_colegiado    String?    @db.VarChar(100)
+  turma                    String?    @db.VarChar(10)
   disciplina_id_disciplina Int
   professor_id_professor   Int?
   semestre_id_semestre     Int
@@ -45,16 +46,13 @@ model disciplina {
   qtd_creditos    Int
   curso_id_curso  Int
   area_id_area    Int
-  turma_id_turma  Int?
   alocacao        alocacao[]
   area            area       @relation(fields: [area_id_area], references: [id_area], onDelete: NoAction, onUpdate: NoAction, map: "fk_disciplina_area1")
   curso           curso      @relation(fields: [curso_id_curso], references: [id_curso], onDelete: NoAction, onUpdate: NoAction, map: "fk_disciplina_curso")
-  turma           turma?     @relation(fields: [turma_id_turma], references: [id_turma], onDelete: NoAction, onUpdate: NoAction, map: "fk_disciplina_turma1")
 
   @@id([id_disciplina, curso_id_curso, area_id_area])
   @@index([area_id_area], map: "fk_disciplina_area1_idx")
   @@index([curso_id_curso], map: "fk_disciplina_curso_idx")
-  @@index([turma_id_turma], map: "fk_disciplina_turma1_idx")
 }
 
 model professor {
@@ -73,10 +71,4 @@ model semestre {
   id_semestre   Int        @id @unique(map: "id_semestre_UNIQUE") @default(autoincrement())
   nome_semestre String     @db.VarChar(10)
   alocacao      alocacao[]
-}
-
-model turma {
-  id_turma   Int          @id @unique(map: "id_turma_UNIQUE") @default(autoincrement())
-  nome_turma String       @db.VarChar(20)
-  disciplina disciplina[]
 }
