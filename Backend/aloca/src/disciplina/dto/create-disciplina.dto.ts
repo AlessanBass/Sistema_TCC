@@ -10,5 +10,4 @@ export class CreateDisciplinaDto {
 	qtd_creditos: number;
 	curso_id_curso: number;
 	area_id_area: number;
-	turma_id_turma: number;
 }

@@ -10,15 +10,25 @@ export class AlocacaoService {
 
   async create(createAlocacaoDto: CreateAlocacaoDto) {
     try {
-      return this.prisma.alocacao.create({
+      let retorno = await this.prisma.alocacao.create({
         data: {
           observacoes_colegiado: createAlocacaoDto.observacoes_colegiado,
+          turma: createAlocacaoDto.turma,
           disciplina_id_disciplina: (+createAlocacaoDto.disciplina_id_disciplina),
           professor_id_professor: (+createAlocacaoDto.professor_id_professor),
           semestre_id_semestre: (+createAlocacaoDto.semestre_id_semestre)
         }
       });
+      // Verifique se a resposta contém um ID ou outra informação importante para garantir que foi criada
+      if (retorno && retorno.id_alocacao) { // Assumindo que há um campo 'id' na resposta
+        console.log('Alocação criada com sucesso:', retorno);
+        return retorno;
+      } else {
+        throw new Error('A resposta do Prisma não contém um ID de alocação.');
+      }
+      
     } catch (e) {
+      console.error('Erro ao cadastrar nova alocação:', e);
       throw new BadRequestException("Erro ao cadastrar nova alocação");
     }
   }
@@ -61,6 +71,11 @@ export class AlocacaoService {
       if (updateAlocacaoDto.observacoes_colegiado != undefined) {
         query += `observacoes_colegiado = ? , `;
         valores.push(updateAlocacaoDto.observacoes_colegiado);
+      }
+
+      if (updateAlocacaoDto.turma != undefined) {
+        query += `turma = ? , `;
+        valores.push(updateAlocacaoDto.turma);
       }
 
       if (updateAlocacaoDto.disciplina_id_disciplina != undefined) {

@@ -11,7 +11,7 @@ export class DisciplinaService {
   async create(createDisciplinaDto: CreateDisciplinaDto) {
     const existingDisciplina = await this.prisma.disciplina.findFirst({ where: { nome_disciplina: createDisciplinaDto.nome_disciplina } });
     if (existingDisciplina) {
-      throw new ConflictException('Já existe uma disciplina com esse nome');
+      throw new ConflictException(`Já existe uma disciplina com esse nome ${createDisciplinaDto.nome_disciplina}`);
     }
 
     // Verifica se já existe uma disciplina com o mesmo código
@@ -19,7 +19,7 @@ export class DisciplinaService {
       where: { cod: createDisciplinaDto.cod }
     });
     if (existingDisciplinaByCod) {
-      throw new ConflictException('Já existe uma disciplina com esse código');
+      throw new ConflictException(`Já existe uma disciplina com esse Cod ${createDisciplinaDto.nome_disciplina}`);
     }
 
 
@@ -28,13 +28,12 @@ export class DisciplinaService {
       return this.prisma.disciplina.create({
         data: {
           periodo: (+createDisciplinaDto.periodo),
-          cod: createDisciplinaDto.cod,
-          nome_disciplina: createDisciplinaDto.nome_disciplina,
+          cod: createDisciplinaDto.cod.trim().toLocaleUpperCase(),
+          nome_disciplina: createDisciplinaDto.nome_disciplina.trim().toLocaleUpperCase(),
           carga_horaria: (+createDisciplinaDto.carga_horaria),
           qtd_creditos: (+createDisciplinaDto.qtd_creditos),
           curso_id_curso: (+createDisciplinaDto.curso_id_curso),
           area_id_area: (+createDisciplinaDto.area_id_area),
-          turma_id_turma: (+createDisciplinaDto.turma_id_turma)
         },
       });
     } catch (error) {
@@ -44,11 +43,7 @@ export class DisciplinaService {
 
   async findAll() {
     try {
-      return this.prisma.disciplina.findMany({
-        orderBy: {
-          nome_disciplina: 'asc'
-        }
-      });
+      return this.prisma.disciplina.findMany();/* Voltar ao normal depois */
     } catch (e) {
       throw new BadRequestException("Erro ao buscar as disciplinas");
     }
@@ -114,9 +109,6 @@ export class DisciplinaService {
       }
       if (updateDisciplinaDto.qtd_creditos !== undefined) {
         dataToUpdate.qtd_creditos = +updateDisciplinaDto.qtd_creditos;
-      }
-      if (updateDisciplinaDto.turma_id_turma !== undefined) {
-        dataToUpdate.turma = +updateDisciplinaDto.turma_id_turma;
       }
       if (updateDisciplinaDto.curso_id_curso !== undefined) {
         dataToUpdate.curso_id_curso = +updateDisciplinaDto.curso_id_curso;
