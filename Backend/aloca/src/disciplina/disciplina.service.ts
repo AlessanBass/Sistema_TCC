@@ -2,7 +2,6 @@ import { BadRequestException, ConflictException, Injectable, InternalServerError
 import { CreateDisciplinaDto } from './dto/create-disciplina.dto';
 import { UpdateDisciplinaDto } from './dto/update-disciplina.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UpdateOfertaDto } from 'src/oferta/dto/update-oferta.dto';
 
 @Injectable()
 export class DisciplinaService {

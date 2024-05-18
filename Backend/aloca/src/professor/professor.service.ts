@@ -33,11 +33,6 @@ export class ProfessorService {
       return this.prisma.professor.findMany({
         include: {
           area: true,
-          alocacao: {
-            include: {
-              disciplina: true
-            }
-          }
         },
         where: {
           area_id_area: areaInt
@@ -57,11 +52,6 @@ export class ProfessorService {
       return this.prisma.professor.findMany({
         include: {
           area: true,
-          alocacao: {
-            include: {
-              disciplina: true
-            }
-          }
         },
 
       });
@@ -79,11 +69,6 @@ export class ProfessorService {
       return this.prisma.professor.findUnique({
         include: {
           area: true,
-          alocacao: {
-            include: {
-              disciplina: true
-            }
-          }
         },
         where: { id_professor: id }
       });
