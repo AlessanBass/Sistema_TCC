@@ -100,20 +100,20 @@ export class EnvioOfertaService {
       let semestre = await this.findSemestre(item); /* Retona o ultimo semestre inserido */
       /* Aqui eu creio uma oferta */
       if (disciplina && curso && semestre && area) {
-        
-        if(item.column6 === undefined){
+
+        if (item.column6 === undefined) {
           item.column6 = null
         }
 
-        if(item.column11 === undefined){
+        if (item.column11 === undefined) {
           item.column11 = null
         }
 
-        if(item.column12 === undefined){
+        if (item.column12 === undefined) {
           item.column12 = null
         }
-        
-        if(typeof item.column11 === 'number'){
+
+        if (typeof item.column11 === 'number') {
           item.column11 = item.column11.toString();
         }
 
@@ -144,25 +144,25 @@ export class EnvioOfertaService {
         }
         /* Colocar isso em uma função */
         let retorno = await this.createDisciplina(newDisciplina);
-        if(!retorno){
+        if (!retorno) {
           console.log(`erro ao salavar a disciplina ${newDisciplina.nome_disciplina}`);
-        }else{
-          if(item.column6 === undefined){
+        } else {
+          if (item.column6 === undefined) {
             item.column6 = null
           }
-  
-          if(item.column11 === undefined){
+
+          if (item.column11 === undefined) {
             item.column11 = null
           }
-  
-          if(item.column12 === undefined){
+
+          if (item.column12 === undefined) {
             item.column12 = null
           }
-          
-          if(typeof item.column11 === 'number'){
+
+          if (typeof item.column11 === 'number') {
             item.column11 = item.column11.toString();
           }
-  
+
           let newOfeta = {
             turma: item.column6,
             formandos: item.column11,
@@ -177,7 +177,7 @@ export class EnvioOfertaService {
     }
   }
 
-  async createOferta(newOferta: Oferta){
+  async createOferta(newOferta: Oferta) {
     try {
       let retorno = await this._oferta.create(newOferta);
       /* if (!retorno) {
@@ -247,5 +247,61 @@ export class EnvioOfertaService {
         return area[0];
       }
     }
+  }
+
+  async download(id_area: number, id_semestre: number) {
+    const area = await this._area.findOne(id_area);
+    const semestre = await this._semestre.findOne(id_semestre);
+    const ofertas = await this._oferta.findByArea(id_area);
+
+    /* Nome do nosso arquivo */
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet(`Indicação ${semestre.nome_semestre} - ${area.nome_area}`);
+
+    /* Adicionar cabeçalhos na minha tabela */
+    worksheet.columns = [
+      {header:'CÓD', key: 'id', width:10 },
+      {header:'DISCIPLINA', key: 'disciplina', width:50 },
+      {header:'CH', key: 'ch', width:10 },
+      {header:'CHs', key: 'chs', width:10 },
+      {header:'TURMA', key: 'turma', width:10 },
+      {header:'B ou L', key: 'boul', width:20 },
+      {header:'CURSO', key: 'curso', width:30 },
+      {header:'PROFESSOR', key: 'professor', width:60 },
+      {header:'ÁREA', key: 'area', width:30 },
+      {header:'FORMANDOS', key: 'formandos', width:30 },
+      {header:'OBSERVAÇÕES', key: 'obs', width:70 },
+    ];
+
+    /* Adicionar os dados a planilha */
+    ofertas.forEach(oferta => {
+     /*  console.log(`COD: ${oferta.disciplina.cod}`);
+      console.log(`DISCIPLINA: ${oferta.disciplina.nome_disciplina}`);
+      console.log(`CH: ${oferta.disciplina.carga_horaria}`);
+      console.log(`CHs: ${oferta.disciplina.carga_horaria}`);
+      console.log(`TURMA: ${oferta.turma}`);
+      console.log(`B ou L: ${oferta.disciplina.curso.tipo_curso}`);
+      console.log(`PROFESSOR: ${' '}`);
+      console.log(`AREA: ${oferta.disciplina.area.nome_area}`);
+      console.log(`FORMANDOS: ${oferta.formandos}`);
+      console.log(`OBS: ${oferta.obs_colegiado}`);
+      console.log("--------------------------------------------------") */
+      worksheet.addRow({
+        id: oferta.disciplina.cod,
+        disciplina: oferta.disciplina.nome_disciplina,
+        ch: oferta.disciplina.carga_horaria,
+        chs: oferta.disciplina.qtd_creditos,
+        turma: oferta.turma,
+        boul: oferta.disciplina.curso.tipo_curso,
+        curso: oferta.disciplina.curso.nome_curso,
+        professor: " ",
+        area: oferta.disciplina.area.nome_area,
+        formandos: oferta.formandos,
+        obs: oferta.obs_colegiado,
+      });
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return buffer;
   }
 }

@@ -68,6 +68,11 @@ export class OfertaService {
   async findByArea(id_area: number){
     try {
       return this.prisma.oferta.findMany({
+        orderBy:{
+          disciplina:{
+            nome_disciplina: 'asc'
+          }
+        },
         where:{
           area_id_area:id_area
         },
