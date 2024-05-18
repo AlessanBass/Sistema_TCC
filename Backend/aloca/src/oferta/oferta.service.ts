@@ -64,6 +64,26 @@ export class OfertaService {
      return ofertaExistente;
   }
 
+  async findByArea(id_curso: number){
+    try {
+      return this.prisma.oferta.findMany({
+        where:{
+          curso_id_curso:id_curso
+        },
+        include:{
+          disciplina:{
+            include:{
+              area:true
+            }
+          },
+          curso: true,
+        }
+      });
+    } catch (error) {
+      throw new BadRequestException("Erro ao procurar pela area da oferta");
+    }
+  }
+
   async update(id: number, updateOfertaDto: UpdateOfertaDto) {
     return `This action updates a #${id} oferta`;
   }

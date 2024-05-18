@@ -22,6 +22,11 @@ export class OfertaController {
     return this.ofertaService.findOne(+id);
   }
 
+  @Get('find-by-area/:idArea')
+  async findByArea(@Param('idArea') id_area: string){
+    return this.ofertaService.findByArea(+id_area);
+  }
+
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateOfertaDto: UpdateOfertaDto) {
     return this.ofertaService.update(+id, updateOfertaDto);
