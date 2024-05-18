@@ -37,7 +37,7 @@ model curso {
 }
 
 model disciplina {
-  id_disciplina   Int       @unique @default(autoincrement())
+  id_disciplina   Int        @unique @default(autoincrement())
   periodo         Int
   cod             String     @db.VarChar(20)
   nome_disciplina String     @db.VarChar(100)
@@ -45,13 +45,12 @@ model disciplina {
   qtd_creditos    Int
   curso_id_curso  Int
   area_id_area    Int
-  turma_id_turma  Int
+  turma_id_turma  Int?
   alocacao        alocacao[]
   area            area       @relation(fields: [area_id_area], references: [id_area], onDelete: NoAction, onUpdate: NoAction, map: "fk_disciplina_area1")
   curso           curso      @relation(fields: [curso_id_curso], references: [id_curso], onDelete: NoAction, onUpdate: NoAction, map: "fk_disciplina_curso")
-  turma           turma      @relation(fields: [turma_id_turma], references: [id_turma], onDelete: NoAction, onUpdate: NoAction, map: "fk_disciplina_turma1")
 
-  @@id([id_disciplina, curso_id_curso, area_id_area, turma_id_turma])
+  @@id([id_disciplina, curso_id_curso, area_id_area])
   @@index([area_id_area], map: "fk_disciplina_area1_idx")
   @@index([curso_id_curso], map: "fk_disciplina_curso_idx")
   @@index([turma_id_turma], map: "fk_disciplina_turma1_idx")
@@ -76,7 +75,6 @@ model semestre {
 }
 
 model turma {
-  id_turma   Int          @id @default(autoincrement())
-  nome_turma String       @db.VarChar(20)
-  disciplina disciplina[]
+  id_turma   Int    @id @default(autoincrement())
+  nome_turma String @db.VarChar(20)
 }
