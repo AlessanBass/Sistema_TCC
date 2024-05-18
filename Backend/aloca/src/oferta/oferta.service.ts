@@ -1,78 +1,74 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import * as ExcelJS from 'exceljs';
-import { writeFile } from 'fs/promises';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { CreateOfertaDto } from './dto/create-oferta.dto';
+import { UpdateOfertaDto } from './dto/update-oferta.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class OfertaService {
+  constructor(private readonly prisma: PrismaService){}
 
-  upload(file: Express.Multer.File, path: string): boolean {
+  async create(createOfertaDto: CreateOfertaDto) {
+   const ofertaExistente = await this.verificaEquals(createOfertaDto);
+   if(ofertaExistente){
+    return null;
+   }
     try {
-      writeFile(path, file.buffer);
-      return true;
+      return this.prisma.oferta.create({
+        data: {
+          turma: createOfertaDto.turma,
+          formandos: createOfertaDto.formandos,
+          obs_colegiado: createOfertaDto.obs_colegiados,
+          disciplina_id_disciplina: (+createOfertaDto.disciplina_id_disciplina),
+          semestre_id_semestre: (+createOfertaDto.semestre_id_semestre),
+          curso_id_curso: (+createOfertaDto.curso_id_curso)
+        }
+      });
     } catch (e) {
-      throw new BadRequestException("Erro ao salvar arquivo"); 
+      throw new BadRequestException("Erro ao cadastrar nova oferta");
     }
   }
 
-  async readExecel(file: Express.Multer.File, path: string) {
-    const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.readFile(path);
-
-    // Obtendo a primeira planilha
-    const sheet = workbook.getWorksheet(1);
-
-    // Array para armazenar os dados da planilha
-    const data = [];
-
-    sheet.eachRow((row, rowNum) => {
-      // Objeto para armazenar os dados de uma linha
-      const rowData = {};
-
-      row.eachCell((cell, colNum) => {
-        // Verificar se o valor da célula é nulo ou indefinido
-        if (cell.value === null || cell.value === undefined) {
-          // Se a célula estiver vazia, definir o valor como zero
-          rowData[`column${colNum}`] = 0;
-        } else {
-          // Se a célula não estiver vazia, usar o valor existente
-          rowData[`column${colNum}`] = cell.value;
+  async findAll() {
+    try {
+      return this.prisma.oferta.findMany({
+        include:{
+          disciplina:true,
+          curso: true
         }
       });
+    } catch (error) {
+      throw new BadRequestException("Erro ao solicitar ofertas");
+    }
+  }
 
-      // Adicionar os dados da linha ao array de dados
-      data.push(rowData);
-    });
+  async findOne(id: number) {
+    try {
+      return this.prisma.oferta.findFirst({
+        where: {
+          id_oferta: id
+        }
+      });
+    } catch (e) {
+      throw new BadRequestException("Erro ao buscar a oferta");
+    }
+  }
 
-    // Agora 'data' contém todos os dados da planilha
-    /* console.log(data.column2); */
-    data.forEach(item => {
-      if(item.column1 === undefined || item.column1 === 0){
-        /* console.log("Não tem professor"); */
-      } else {
-        console.log(item);
+  async verificaEquals(createOfertaDto: CreateOfertaDto){
+    const ofertaExistente = await this.prisma.oferta.findFirst({
+      where: {
+        disciplina_id_disciplina: (+createOfertaDto.disciplina_id_disciplina),
+        turma: createOfertaDto.turma
       }
     });
- 
+
+     return ofertaExistente;
   }
 
-
-  /* create(createOfertaDto: CreateOfertaDto) {
-    return 'Acessei aqui na rota';
-  }
-
-  findAll() {
-    return `This action returns all oferta`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} oferta`;
-  }
-
-  update(id: number, updateOfertaDto: UpdateOfertaDto) {
+  async update(id: number, updateOfertaDto: UpdateOfertaDto) {
     return `This action updates a #${id} oferta`;
   }
 
-  remove(id: number) {
+  async remove(id: number) {
     return `This action removes a #${id} oferta`;
-  } */
+  }
 }

@@ -8,19 +8,14 @@ datasource db {
 }
 
 model alocacao {
-  id_alocacao              Int        @default(autoincrement())
-  observacoes_colegiado    String?    @db.VarChar(100)
-  disciplina_id_disciplina Int
-  professor_id_professor   Int
-  semestre_id_semestre     Int
-  disciplina               disciplina @relation(fields: [disciplina_id_disciplina], references: [id_disciplina], onDelete: NoAction, onUpdate: NoAction, map: "fk_alocacao_disciplina1")
-  professor                professor  @relation(fields: [professor_id_professor], references: [id_professor], onDelete: NoAction, onUpdate: NoAction, map: "fk_alocacao_professor1")
-  semestre                 semestre   @relation(fields: [semestre_id_semestre], references: [id_semestre], onDelete: NoAction, onUpdate: NoAction, map: "fk_alocacao_semestre1")
+  id_alocacao            Int       @id @unique(map: "id_alocacao_UNIQUE") @default(autoincrement())
+  oferta_id_oferta       Int
+  professor_id_professor Int
+  oferta                 oferta    @relation(fields: [oferta_id_oferta], references: [id_oferta], onDelete: NoAction, onUpdate: NoAction, map: "fk_alocacao_oferta1")
+  professor              professor @relation(fields: [professor_id_professor], references: [id_professor], onDelete: NoAction, onUpdate: NoAction, map: "fk_alocacao_professor1")
 
-  @@id([id_alocacao, disciplina_id_disciplina, professor_id_professor, semestre_id_semestre])
-  @@index([disciplina_id_disciplina], map: "fk_alocacao_disciplina1_idx")
   @@index([professor_id_professor], map: "fk_alocacao_professor1_idx")
-  @@index([semestre_id_semestre], map: "fk_alocacao_semestre1_idx")
+  @@index([oferta_id_oferta], map: "fk_alocacao_oferta1_idx")
 }
 
 model area {
@@ -31,45 +26,61 @@ model area {
 }
 
 model curso {
-  id_curso   Int          @id @default(autoincrement())
+  id_curso   Int          @id @unique(map: "id_curso_UNIQUE") @default(autoincrement())
   nome_curso String       @db.VarChar(100)
   tipo_curso String       @db.VarChar(100)
   disciplina disciplina[]
+  oferta     oferta[]
 }
 
 model disciplina {
-  id_disciplina   Int        @default(autoincrement()) @unique
+  id_disciplina   Int      @id @unique(map: "id_disciplina_UNIQUE") @default(autoincrement())
   periodo         Int
-  cod             String     @db.VarChar(20)
-  nome_disciplina String     @db.VarChar(100)
+  cod             String   @db.VarChar(20)
+  nome_disciplina String   @db.VarChar(100)
   carga_horaria   Int
   qtd_creditos    Int
-  turma           String     @db.VarChar(6)
   curso_id_curso  Int
   area_id_area    Int
-  alocacao        alocacao[]
-  area            area       @relation(fields: [area_id_area], references: [id_area], onDelete: NoAction, onUpdate: NoAction, map: "fk_disciplina_area1")
-  curso           curso      @relation(fields: [curso_id_curso], references: [id_curso], onDelete: NoAction, onUpdate: NoAction, map: "fk_disciplina_curso")
+  area            area     @relation(fields: [area_id_area], references: [id_area], onDelete: NoAction, onUpdate: NoAction, map: "fk_disciplina_area1")
+  curso           curso    @relation(fields: [curso_id_curso], references: [id_curso], onDelete: NoAction, onUpdate: NoAction, map: "fk_disciplina_curso")
+  oferta          oferta[]
 
-  @@id([id_disciplina, curso_id_curso, area_id_area])
   @@index([area_id_area], map: "fk_disciplina_area1_idx")
   @@index([curso_id_curso], map: "fk_disciplina_curso_idx")
 }
 
 model professor {
-  id_professor   Int        @unique(map: "id_professores_UNIQUE") @default(autoincrement())
+  id_professor   Int        @id @unique(map: "id_professores_UNIQUE") @default(autoincrement())
   nome_professor String     @db.VarChar(150)
   observacoes    String?    @db.VarChar(100)
   area_id_area   Int
   alocacao       alocacao[]
   area           area       @relation(fields: [area_id_area], references: [id_area], onDelete: NoAction, onUpdate: NoAction, map: "fk_professor_area1")
 
-  @@id([id_professor, area_id_area])
   @@index([area_id_area], map: "fk_professor_area1_idx")
 }
 
 model semestre {
-  id_semestre   Int        @id @default(autoincrement())
-  nome_semestre String     @db.VarChar(10)
-  alocacao      alocacao[]
+  id_semestre   Int      @id @unique(map: "id_semestre_UNIQUE") @default(autoincrement())
+  nome_semestre String   @db.VarChar(10)
+  oferta        oferta[]
+}
+
+model oferta {
+  id_oferta                Int        @id @unique(map: "idoferta_UNIQUE") @default(autoincrement())
+  turma                    String?    @db.VarChar(20)
+  formandos                String?    @db.VarChar(45)
+  obs_colegiado            String?    @db.VarChar(100)
+  disciplina_id_disciplina Int
+  semestre_id_semestre     Int
+  curso_id_curso           Int
+  alocacao                 alocacao[]
+  curso                    curso      @relation(fields: [curso_id_curso], references: [id_curso], onDelete: NoAction, onUpdate: NoAction, map: "fk_oferta_curso1")
+  disciplina               disciplina @relation(fields: [disciplina_id_disciplina], references: [id_disciplina], onDelete: NoAction, onUpdate: NoAction, map: "fk_oferta_disciplina1")
+  semestre                 semestre   @relation(fields: [semestre_id_semestre], references: [id_semestre], onDelete: NoAction, onUpdate: NoAction, map: "fk_oferta_semestre1")
+
+  @@index([curso_id_curso], map: "fk_oferta_curso1_idx")
+  @@index([disciplina_id_disciplina], map: "fk_oferta_disciplina1_idx")
+  @@index([semestre_id_semestre], map: "fk_oferta_semestre1_idx")
 }

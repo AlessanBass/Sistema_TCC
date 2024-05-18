@@ -10,15 +10,22 @@ export class AlocacaoService {
 
   async create(createAlocacaoDto: CreateAlocacaoDto) {
     try {
-      return this.prisma.alocacao.create({
+      let retorno = await this.prisma.alocacao.create({
         data: {
-          observacoes_colegiado: createAlocacaoDto.observacoes_colegiado,
-          disciplina_id_disciplina: (+createAlocacaoDto.disciplina_id_disciplina),
-          professor_id_professor: (+createAlocacaoDto.professor_id_professor),
-          semestre_id_semestre: (+createAlocacaoDto.semestre_id_semestre)
+          oferta_id_oferta: (+createAlocacaoDto.oferta_id_oferta),
+          professor_id_professor:(+createAlocacaoDto.professor_id_professor)
         }
       });
+      // Verifique se a resposta contém um ID ou outra informação importante para garantir que foi criada
+      if (retorno && retorno.id_alocacao) { // Assumindo que há um campo 'id' na resposta
+        console.log('Alocação criada com sucesso:', retorno);
+        return retorno;
+      } else {
+        throw new Error('A resposta do Prisma não contém um ID de alocação.');
+      }
+      
     } catch (e) {
+      console.error('Erro ao cadastrar nova alocação:', e);
       throw new BadRequestException("Erro ao cadastrar nova alocação");
     }
   }
@@ -27,9 +34,8 @@ export class AlocacaoService {
     try {
       return this.prisma.alocacao.findMany({
         include: {
-          disciplina: true, // Inclui todas as informações da disciplina relacionada
-          professor: true, // Inclui todas as informações do professor relacionado
-          semestre: true, // Inclui todas as informações do semestre relacionado
+          oferta: true,
+          professor: true
         },
       });
     } catch (e) {
@@ -42,13 +48,11 @@ export class AlocacaoService {
     return this.prisma.$queryRaw`
      SELECT 
      alocacao.*,
-     disciplina.*,
-     professor.*,
-     semestre.*
+     oferta.*,
+     professor.*
      FROM alocacao
-     INNER JOIN disciplina ON alocacao.disciplina_id_disciplina = disciplina.id_disciplina
+     INNER JOIN oferta ON alocacao.oferta_id_oferta = oferta.id_oferta
      INNER JOIN professor ON alocacao.professor_id_professor = professor.id_professor
-     INNER JOIN semestre ON alocacao.semestre_id_semestre = semestre.id_semestre
      WHERE alocacao.id_alocacao = ${id}
      `;
   }
@@ -58,24 +62,14 @@ export class AlocacaoService {
       let query = `UPDATE alocacao SET `;
       let valores: any[] = [];
 
-      if (updateAlocacaoDto.observacoes_colegiado != undefined) {
+      if (updateAlocacaoDto.oferta_id_oferta != undefined) {
         query += `observacoes_colegiado = ? , `;
-        valores.push(updateAlocacaoDto.observacoes_colegiado);
-      }
-
-      if (updateAlocacaoDto.disciplina_id_disciplina != undefined) {
-        query += `disciplina_id_disciplina = ? , `;
-        valores.push(+updateAlocacaoDto.disciplina_id_disciplina);
+        valores.push(updateAlocacaoDto.oferta_id_oferta);
       }
 
       if (updateAlocacaoDto.professor_id_professor != undefined) {
-        query += `professor_id_professor = ? , `;
-        valores.push(+updateAlocacaoDto.professor_id_professor);
-      }
-
-      if (updateAlocacaoDto.semestre_id_semestre != undefined) {
-        query += `semestre_id_semestre = ? , `;
-        valores.push(+updateAlocacaoDto.semestre_id_semestre);
+        query += `observacoes_colegiado = ? , `;
+        valores.push(updateAlocacaoDto.professor_id_professor);
       }
 
       /* Remove a última vírgula da query */
