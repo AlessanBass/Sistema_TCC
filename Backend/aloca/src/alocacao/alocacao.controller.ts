@@ -17,6 +17,11 @@ export class AlocacaoController {
     return this.alocacaoService.findAll();
   }
 
+  @Get('findByColegiado/:id_colegiado')
+  async findByColegiado(@Param('id_colegiado') id_colegiado: string){
+    return this.alocacaoService.findByColegiado(+id_colegiado);
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.alocacaoService.findOne(+id);

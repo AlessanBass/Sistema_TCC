@@ -133,4 +133,42 @@ export class AlocacaoService {
     }
     
   }
+
+  async findByColegiado(id_colegiado: number){
+    try {
+      const retorno = await this.prisma.alocacao.findMany({
+        where:{
+          oferta:{
+            disciplina:{
+              curso:{
+                id_curso: id_colegiado
+              }
+            }
+          }
+        },
+        include:{
+          oferta:{
+            include:{
+              disciplina:{
+                include:{
+                  curso:true
+                }
+              },
+              area:true
+            }
+          },
+          professor:true
+        }
+      });
+
+      if(!retorno){
+        return null;
+      }
+
+      return retorno;
+      
+    } catch (error) {
+      throw new BadRequestException("Erro ao buscar alocação por colegiado!");
+    }
+  }
 }
