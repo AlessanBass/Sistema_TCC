@@ -165,4 +165,22 @@ export class ProfessorService {
   }
 
 
+  async findByName(name: string){
+    try {
+      let professor = this.prisma.professor.findFirst({
+        where:{
+          nome_professor:name
+        }
+      });
+
+      if(!professor){
+        return null
+      }
+
+      return professor;
+    } catch (error) {
+      throw new BadRequestException("Erro ao procurar o professor");
+    }
+  }
+
 }

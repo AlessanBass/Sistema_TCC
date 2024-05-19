@@ -1,5 +1,5 @@
 export class CreateProfessorDto {
     nomeProfessor: string;
-    observacoes?: string;
-    area_id_area: string;
+    observacoes?: string | null;
+    area_id_area: number;
 }

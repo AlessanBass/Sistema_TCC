@@ -17,6 +17,11 @@ export class OfertaController {
     return this.ofertaService.findAll();
   }
 
+  @Get('findByDisciplinaAndTurma/:disciplina/:turma')
+  async findByDisciplinaAndTurma(@Param('disciplina') disciplina: string, @Param('turma') turma: string){
+    return this.ofertaService.findByDisciplinaAndTurma(disciplina, turma);
+  }
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.ofertaService.findOne(+id);

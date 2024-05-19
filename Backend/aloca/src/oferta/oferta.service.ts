@@ -35,6 +35,11 @@ export class OfertaService {
           disciplina:true,
           area: true,
           semestre:true
+        },
+        orderBy:{
+          disciplina:{
+            nome_disciplina: 'asc'
+          }
         }
       });
     } catch (error) {
@@ -87,6 +92,27 @@ export class OfertaService {
       });
     } catch (error) {
       throw new BadRequestException("Erro ao procurar pela area da oferta");
+    }
+  }
+
+  async findByDisciplinaAndTurma(disciplina: string, turma: string){
+    try {
+      let oferta = await this.prisma.oferta.findFirst({
+        where:{
+          disciplina:{
+            nome_disciplina:disciplina
+          },  
+          turma: turma
+        }
+      });
+
+      if(!oferta){
+        return null
+      }
+
+      return oferta;
+    } catch (error) {
+      throw new BadRequestException("Erro ao procurar pela disicplina da oferta");
     }
   }
 

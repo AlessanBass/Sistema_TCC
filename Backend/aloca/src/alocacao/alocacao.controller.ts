@@ -7,14 +7,19 @@ import { UpdateAlocacaoDto } from './dto/update-alocacao.dto';
 export class AlocacaoController {
   constructor(private readonly alocacaoService: AlocacaoService) {}
 
-  @Post()
-  async create(@Body() createAlocacaoDto: CreateAlocacaoDto) {
-    return this.alocacaoService.create(createAlocacaoDto);
+  @Post(':turma')
+  async create(@Body() createAlocacaoDto: CreateAlocacaoDto, @Param('turma') turma: string) {
+    return this.alocacaoService.create(createAlocacaoDto, turma);
   }
 
   @Get()
   async findAll() {
     return this.alocacaoService.findAll();
+  }
+
+  @Get('findByColegiado/:id_colegiado')
+  async findByColegiado(@Param('id_colegiado') id_colegiado: string){
+    return this.alocacaoService.findByColegiado(+id_colegiado);
   }
 
   @Get(':id')
