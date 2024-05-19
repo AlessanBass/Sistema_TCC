@@ -4,5 +4,5 @@ export class CreateOfertaDto {
     obs_colegiados?: string | null;
     disciplina_id_disciplina: number;
     semestre_id_semestre: number;
-    curso_id_curso: number;
+    area_id_area: number;
 }

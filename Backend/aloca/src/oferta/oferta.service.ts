@@ -20,7 +20,7 @@ export class OfertaService {
           obs_colegiado: createOfertaDto.obs_colegiados,
           disciplina_id_disciplina: (+createOfertaDto.disciplina_id_disciplina),
           semestre_id_semestre: (+createOfertaDto.semestre_id_semestre),
-          curso_id_curso: (+createOfertaDto.curso_id_curso)
+          area_id_area: (+createOfertaDto.area_id_area)
         }
       });
     } catch (e) {
@@ -33,7 +33,8 @@ export class OfertaService {
       return this.prisma.oferta.findMany({
         include:{
           disciplina:true,
-          curso: true
+          area: true,
+          semestre:true
         }
       });
     } catch (error) {
@@ -62,6 +63,31 @@ export class OfertaService {
     });
 
      return ofertaExistente;
+  }
+
+  async findByArea(id_area: number){
+    try {
+      return this.prisma.oferta.findMany({
+        orderBy:{
+          disciplina:{
+            nome_disciplina: 'asc'
+          }
+        },
+        where:{
+          area_id_area:id_area
+        },
+        include:{
+          disciplina:{
+            include:{
+              area:true,
+              curso:true,
+            }
+          }
+        }
+      });
+    } catch (error) {
+      throw new BadRequestException("Erro ao procurar pela area da oferta");
+    }
   }
 
   async update(id: number, updateOfertaDto: UpdateOfertaDto) {
