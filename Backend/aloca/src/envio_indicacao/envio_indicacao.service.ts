@@ -93,6 +93,7 @@ export class EnvioIndicacaoService {
         console.log('Erro na oferta, por favor fazer a inserção no banco');
       }
 
+
       if (area && professor && oferta) {
         /*  console.log(`Professor: ${professor.nome_professor} | ID OFERTA: ${oferta.id_oferta}} | TURMA: ${oferta.turma}`); */
         let newAlocacao = {
@@ -166,6 +167,9 @@ export class EnvioIndicacaoService {
   }
 
   async findProfessor(item: any) {
+    if(item.column8 === undefined || item.column8 === null){
+      item.column8 = "SEM INDICAÇÃO";
+    }
     let retorno = await this._professor.findByName(item.column8.trim());
     if (retorno === null || retorno === undefined) {
       return null;
