@@ -249,59 +249,81 @@ export class EnvioOfertaService {
     }
   }
 
-  async download(id_area: number, id_semestre: number) {
-    const area = await this._area.findOne(id_area);
-    const semestre = await this._semestre.findOne(id_semestre);
-    const ofertas = await this._oferta.findByArea(id_area);
-
-    /* Nome do nosso arquivo */
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet(`Indicação ${semestre.nome_semestre} - ${area.nome_area}`);
-
-    /* Adicionar cabeçalhos na minha tabela */
-    worksheet.columns = [
-      {header:'CÓD', key: 'id', width:10 },
-      {header:'DISCIPLINA', key: 'disciplina', width:50 },
-      {header:'CH', key: 'ch', width:10 },
-      {header:'CHs', key: 'chs', width:10 },
-      {header:'TURMA', key: 'turma', width:10 },
-      {header:'B ou L', key: 'boul', width:20 },
-      {header:'CURSO', key: 'curso', width:30 },
-      {header:'PROFESSOR', key: 'professor', width:60 },
-      {header:'ÁREA', key: 'area', width:30 },
-      {header:'FORMANDOS', key: 'formandos', width:30 },
-      {header:'OBSERVAÇÕES', key: 'obs', width:70 },
-    ];
-
-    /* Adicionar os dados a planilha */
-    ofertas.forEach(oferta => {
-     /*  console.log(`COD: ${oferta.disciplina.cod}`);
-      console.log(`DISCIPLINA: ${oferta.disciplina.nome_disciplina}`);
-      console.log(`CH: ${oferta.disciplina.carga_horaria}`);
-      console.log(`CHs: ${oferta.disciplina.carga_horaria}`);
-      console.log(`TURMA: ${oferta.turma}`);
-      console.log(`B ou L: ${oferta.disciplina.curso.tipo_curso}`);
-      console.log(`PROFESSOR: ${' '}`);
-      console.log(`AREA: ${oferta.disciplina.area.nome_area}`);
-      console.log(`FORMANDOS: ${oferta.formandos}`);
-      console.log(`OBS: ${oferta.obs_colegiado}`);
-      console.log("--------------------------------------------------") */
-      worksheet.addRow({
-        id: oferta.disciplina.cod,
-        disciplina: oferta.disciplina.nome_disciplina,
-        ch: oferta.disciplina.carga_horaria,
-        chs: oferta.disciplina.qtd_creditos,
-        turma: oferta.turma,
-        boul: oferta.disciplina.curso.tipo_curso,
-        curso: oferta.disciplina.curso.nome_curso,
-        professor: " ",
-        area: oferta.disciplina.area.nome_area,
-        formandos: oferta.formandos,
-        obs: oferta.obs_colegiado,
-      });
-    });
-
-    const buffer = await workbook.xlsx.writeBuffer();
-    return buffer;
+  async finOneSemestre(id_semestre: number){
+    return this._semestre.findOne(id_semestre);
   }
+
+  async finOneArea(id_area: number){
+    return this._area.findOne(id_area);
+  }
+
+    async download(id_area: number, id_semestre: number) {
+      const area = await this._area.findOne(id_area);
+      const semestre = await this._semestre.findOne(id_semestre);
+      const ofertas = await this._oferta.findByArea(id_area);
+
+      /* Nome do nosso arquivo */
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet(`Indicação ${semestre.nome_semestre} - ${area.nome_area}`);
+
+      /* Adicionar cabeçalhos na minha tabela */
+      let headers = [
+        {header:'CÓD', key: 'id', width:10 },
+        {header:'DISCIPLINA', key: 'disciplina', width:50 },
+        {header:'CH', key: 'ch', width:10 },
+        {header:'CHs', key: 'chs', width:10 },
+        {header:'TURMA', key: 'turma', width:10 },
+        {header:'B ou L', key: 'boul', width:20 },
+        {header:'CURSO', key: 'curso', width:30 },
+        {header:'PROFESSOR', key: 'professor', width:60 },
+        {header:'ÁREA', key: 'area', width:30 },
+        {header:'FORMANDOS', key: 'formandos', width:30 },
+        {header:'OBSERVAÇÕES', key: 'obs', width:70 },
+      ];
+
+      worksheet.columns = headers;
+
+      /* Aplicando estilo */
+      worksheet.getRow(1).eachCell((cell) => {
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }; // Cor da fonte branca
+        cell.fill = {
+          type: 'pattern',
+          pattern:'solid',
+          fgColor:{argb:'FF0000FF'} // Cor de fundo azul
+        };
+      });
+      
+
+      /* Adicionar os dados a planilha */
+      ofertas.forEach(oferta => {
+      /*  console.log(`COD: ${oferta.disciplina.cod}`);
+        console.log(`DISCIPLINA: ${oferta.disciplina.nome_disciplina}`);
+        console.log(`CH: ${oferta.disciplina.carga_horaria}`);
+        console.log(`CHs: ${oferta.disciplina.carga_horaria}`);
+        console.log(`TURMA: ${oferta.turma}`);
+        console.log(`B ou L: ${oferta.disciplina.curso.tipo_curso}`);
+        console.log(`PROFESSOR: ${' '}`);
+        console.log(`AREA: ${oferta.disciplina.area.nome_area}`);
+        console.log(`FORMANDOS: ${oferta.formandos}`);
+        console.log(`OBS: ${oferta.obs_colegiado}`);
+        console.log("--------------------------------------------------") */
+        worksheet.addRow({
+          id: oferta.disciplina.cod,
+          disciplina: oferta.disciplina.nome_disciplina,
+          ch: oferta.disciplina.carga_horaria,
+          chs: oferta.disciplina.qtd_creditos,
+          turma: oferta.turma,
+          boul: oferta.disciplina.curso.tipo_curso,
+          curso: oferta.disciplina.curso.nome_curso,
+          professor: " ",
+          area: oferta.disciplina.area.nome_area,
+          formandos: oferta.formandos,
+          obs: oferta.obs_colegiado,
+        });
+      });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      return buffer;
+    }
 }

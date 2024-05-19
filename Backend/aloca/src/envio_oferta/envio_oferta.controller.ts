@@ -11,9 +11,15 @@ export class EnvioOfertaController {
   @Get('downloadByArea/:idArea/:idSemestre')
   //@Res() resposnse: Response,
   async download( @Res() res: Response, @Param('idArea') id_area: string, @Param('idSemestre') id_semestre: string){
-    /* return this.envioOfertaService.download(+id_area, +id_semestre); */
+    const area = await this.envioOfertaService.finOneArea(+id_area);
+    const semestre = await this.envioOfertaService.finOneSemestre(+id_semestre);
+    const nomeSemestre = encodeURIComponent(semestre.nome_semestre);
+    const nomeArea = encodeURIComponent(area.nome_area);
+    const indica = encodeURIComponent("Indicação");
+    const filename = `${indica} Docente ${nomeSemestre} - ${nomeArea}.xlsx`;
+
     const buffer = await this.envioOfertaService.download(+id_area, +id_semestre);
-    res.setHeader('Content-Disposition', 'attachment; filename=meu-arquivo-por-area.xlsx');
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${filename}`);
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.send(buffer);
   } 
