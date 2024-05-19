@@ -158,6 +158,13 @@ export class AlocacaoService {
             }
           },
           professor:true
+        },
+        orderBy:{
+          oferta:{
+            disciplina:{
+              nome_disciplina: 'asc'
+            }
+          }
         }
       });
 

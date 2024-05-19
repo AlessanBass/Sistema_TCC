@@ -100,7 +100,6 @@ export class EnvioOfertaService {
       let semestre = await this.findSemestre(item); /* Retona o ultimo semestre inserido */
       /* Aqui eu creio uma oferta */
       if (disciplina && curso && semestre && area) {
-
         if (item.column6 === undefined) {
           item.column6 = "SEM TURMA";
         }
@@ -180,6 +179,7 @@ export class EnvioOfertaService {
   async createOferta(newOferta: Oferta) {
     try {
       let retorno = await this._oferta.create(newOferta);
+      /* if(retorno){console.log(retorno.disciplina_id_disciplina)} */
       /* if (!retorno) {
         throw new BadRequestException(`Erro ao tentar criar a oferta`);
       } */

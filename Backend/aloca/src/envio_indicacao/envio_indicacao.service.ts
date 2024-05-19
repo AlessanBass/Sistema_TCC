@@ -6,6 +6,8 @@ import { AreaService } from 'src/area/area.service';
 import { DisciplinaService } from 'src/disciplina/disciplina.service';
 import { AlocacaoService } from 'src/alocacao/alocacao.service';
 import { OfertaService } from 'src/oferta/oferta.service';
+import { SemestreService } from 'src/semestre/semestre.service';
+import { CursoService } from 'src/curso/curso.service';
 
 interface Alocacao {
   oferta_id_oferta: number;
@@ -26,7 +28,9 @@ export class EnvioIndicacaoService {
     private readonly _area: AreaService,
     private readonly _professor: ProfessorService,
     private readonly _alocacao: AlocacaoService,
-    private readonly _oferta: OfertaService
+    private readonly _oferta: OfertaService,
+    private readonly _semestre: SemestreService,
+    private readonly _curso: CursoService
   ) { }
 
   async upload(file: Express.Multer.File, path: string): Promise<boolean> {
@@ -167,7 +171,7 @@ export class EnvioIndicacaoService {
   }
 
   async findProfessor(item: any) {
-    if(item.column8 === undefined || item.column8 === null){
+    if(item.column8 === undefined || item.column8 === null || item.column8.length <5){
       item.column8 = "SEM INDICAÇÃO";
     }
     let retorno = await this._professor.findByName(item.column8.trim());
@@ -194,5 +198,81 @@ export class EnvioIndicacaoService {
       return null;
     }
     return retorno;
+  }
+
+  async finOneSemestre(id_semestre: number){
+    return this._semestre.findOne(id_semestre);
+  }
+
+  async findOneCurso(id_colegiado: number){
+    return this._curso.findOne(id_colegiado);
+  }
+
+  async download(id_colegiado: number, id_semestre: number) {
+    const colegiado = await this._curso.findOne(id_colegiado);
+    const semestre = await this._semestre.findOne(id_semestre);
+    const alocacoes = await this._alocacao.findByColegiado(id_colegiado);
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet(`Indicação ${semestre.nome_semestre}`);
+
+    /* Adicionar cabeçalhos na minha tabela */
+    let headers = [
+      {header:'CÓD', key: 'id', width:10 },
+      {header:'DISCIPLINA', key: 'disciplina', width:50 },
+      {header:'CH', key: 'ch', width:10 },
+      {header:'CHs', key: 'chs', width:10 },
+      {header:'TURMA', key: 'turma', width:10 },
+      {header:'B ou L', key: 'boul', width:20 },
+      {header:'CURSO', key: 'curso', width:30 },
+      {header:'PROFESSOR', key: 'professor', width:60 },
+      {header:'ÁREA', key: 'area', width:30 },
+      {header:'FORMANDOS', key: 'formandos', width:30 },
+      {header:'OBSERVAÇÕES', key: 'obs', width:70 },
+    ];
+
+    worksheet.columns = headers;
+
+    /* Aplicando estilo */
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }; // Cor da fonte branca
+      cell.fill = {
+        type: 'pattern',
+        pattern:'solid',
+        fgColor:{argb:'FF0000FF'} // Cor de fundo azul
+      };
+    });
+
+    alocacoes.forEach(alocacao =>{
+        /* console.log(`COD: ${alocacao.oferta.disciplina.cod}`);
+        console.log(`DISCIPLINA: ${alocacao.oferta.disciplina.nome_disciplina}`);
+        console.log(`CH: ${alocacao.oferta.disciplina.carga_horaria}`);
+        console.log(`CHs: ${alocacao.oferta.disciplina.carga_horaria}`);
+        console.log(`TURMA: ${alocacao.oferta.turma}`);
+        console.log(`B ou L: ${alocacao.oferta.disciplina.curso.tipo_curso}`);
+        console.log(`CURSO: ${alocacao.oferta.disciplina.curso.nome_curso}`);
+        console.log(`PROFESSOR: ${alocacao.professor.nome_professor}`);
+        console.log(`AREA: ${alocacao.oferta.area.nome_area}`);
+        console.log(`FORMANDOS: ${alocacao.oferta.formandos}`);
+        console.log(`OBS: ${alocacao.oferta.obs_colegiado}`);
+        console.log("--------------------------------------------------"); */
+
+        worksheet.addRow({
+          id: alocacao.oferta.disciplina.cod,
+          disciplina: alocacao.oferta.disciplina.nome_disciplina,
+          ch: alocacao.oferta.disciplina.carga_horaria,
+          chs: alocacao.oferta.disciplina.qtd_creditos,
+          turma: alocacao.oferta.turma,
+          boul: alocacao.oferta.disciplina.curso.tipo_curso,
+          curso: alocacao.oferta.disciplina.curso.nome_curso,
+          professor: alocacao.professor.nome_professor,
+          area: alocacao.oferta.area.nome_area,
+          formandos: alocacao.oferta.formandos,
+          obs: alocacao.oferta.obs_colegiado,
+        });
+    });
+    const buffer = await workbook.xlsx.writeBuffer();
+    return buffer;
   }
 }
