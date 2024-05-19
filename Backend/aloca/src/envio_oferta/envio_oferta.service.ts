@@ -102,7 +102,7 @@ export class EnvioOfertaService {
       if (disciplina && curso && semestre && area) {
 
         if (item.column6 === undefined) {
-          item.column6 = null
+          item.column6 = "SEM TURMA";
         }
 
         if (item.column11 === undefined) {
@@ -148,7 +148,7 @@ export class EnvioOfertaService {
           console.log(`erro ao salavar a disciplina ${newDisciplina.nome_disciplina}`);
         } else {
           if (item.column6 === undefined) {
-            item.column6 = null
+            item.column6 = "SEM TURMA"
           }
 
           if (item.column11 === undefined) {
@@ -272,7 +272,7 @@ export class EnvioOfertaService {
         {header:'DISCIPLINA', key: 'disciplina', width:50 },
         {header:'CH', key: 'ch', width:10 },
         {header:'CHs', key: 'chs', width:10 },
-        {header:'TURMA', key: 'turma', width:10 },
+        {header:'TURMA', key: 'turma', width:15 },
         {header:'B ou L', key: 'boul', width:20 },
         {header:'CURSO', key: 'curso', width:30 },
         {header:'PROFESSOR', key: 'professor', width:60 },

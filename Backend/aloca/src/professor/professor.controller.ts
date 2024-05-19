@@ -7,34 +7,40 @@ import { UpdateProfessorDto } from './dto/update-professor.dto';
 export class ProfessorController {
   constructor(private readonly professorService: ProfessorService) {}
 
+  @Get()
+  async findAll(@Query('area') area?: string) {
+    if(area){
+      return this.professorService.findByArea(area);
+    }else{
+      return this.professorService.findAll();
+    }
+    /* http://localhost:3000/professor?area=1 (Parametro opcional)*/
+  }
+
   @Post()
   async create(@Body() createProfessorDto: CreateProfessorDto) {
     //console.log(createProfessorDto);
     return this.professorService.create(createProfessorDto);
   }
 
-  @Get()
-  findAll(@Query('area') area?: string) {
-    if(area){
-      return this.professorService.findByArea(area);
-    }else{
-      return this.professorService.findAll();
-    }
-    
-  }
-
+  
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  async findOne(@Param('id') id: string) {
     return this.professorService.findOne(+id);
   }
 
+  @Get('name/:name')
+  async findByName(@Param('name') name: string){
+    return this.professorService.findByName(name);
+  }
+
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProfessorDto: UpdateProfessorDto) {
+  async update(@Param('id') id: string, @Body() updateProfessorDto: UpdateProfessorDto) {
     return this.professorService.update(+id, updateProfessorDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     return this.professorService.remove(+id);
   }
 }

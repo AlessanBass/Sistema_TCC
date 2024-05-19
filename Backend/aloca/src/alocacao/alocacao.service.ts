@@ -2,13 +2,16 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { CreateAlocacaoDto } from './dto/create-alocacao.dto';
 import { UpdateAlocacaoDto } from './dto/update-alocacao.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AlocacaoService {
   constructor(private readonly prisma: PrismaService) { }
 
-  async create(createAlocacaoDto: CreateAlocacaoDto) {
+  async create(createAlocacaoDto: CreateAlocacaoDto, turma: string) {
+    let retorno = await this.verificaEquals(createAlocacaoDto, turma);
+    if(retorno){
+      return null;
+    }
     try {
       let retorno = await this.prisma.alocacao.create({
         data: {
@@ -16,9 +19,7 @@ export class AlocacaoService {
           professor_id_professor:(+createAlocacaoDto.professor_id_professor)
         }
       });
-      // Verifique se a resposta contém um ID ou outra informação importante para garantir que foi criada
-      if (retorno && retorno.id_alocacao) { // Assumindo que há um campo 'id' na resposta
-        console.log('Alocação criada com sucesso:', retorno);
+      if (retorno) {
         return retorno;
       } else {
         throw new Error('A resposta do Prisma não contém um ID de alocação.');
@@ -34,8 +35,12 @@ export class AlocacaoService {
     try {
       return this.prisma.alocacao.findMany({
         include: {
-          oferta: true,
-          professor: true
+          oferta: {
+            include:{
+              disciplina:true
+            }
+          },
+          professor: true,
         },
       });
     } catch (e) {
@@ -89,7 +94,6 @@ export class AlocacaoService {
     }
   }
 
-
   async remove(id: number) {
     try {
       const alocacao = await this.findOne(id);
@@ -105,5 +109,28 @@ export class AlocacaoService {
       throw new BadRequestException("Não existe essa alocação");
     }
 
+  }
+
+  async verificaEquals(createAlocacaoDto: CreateAlocacaoDto, turma: string){
+    try {
+      const alocacaoExistente = await this.prisma.alocacao.findFirst({
+        where:{
+          professor_id_professor: (+createAlocacaoDto.professor_id_professor),
+          oferta_id_oferta: (+createAlocacaoDto.oferta_id_oferta),
+          oferta:{
+            turma: turma
+          }
+        }
+      });
+
+      if(!alocacaoExistente){
+        return null;
+      }
+
+      return alocacaoExistente;
+    } catch (error) {
+      throw new BadRequestException("Erro ao buscar alocacao com base na oferta e turma");
+    }
+    
   }
 }

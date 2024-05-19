@@ -38,7 +38,6 @@ export class SemestreService {
   }
 
   async findOne(id: number) {
-    console.log("entrei nessa porra");
     try {
       const semestre = await this.prisma.semestre.findUnique({
         where: { id_semestre: id }
