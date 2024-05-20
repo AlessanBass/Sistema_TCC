@@ -62,22 +62,14 @@ export class OfertaService {
 
   async verificaEquals(createOfertaDto: CreateOfertaDto) {
     try {
-      console.log("Verifica Equals: ");
       const ofertaExistente = await this.prisma.oferta.findFirst({
         where: {
           disciplina_id_disciplina: (+createOfertaDto.disciplina_id_disciplina),
           turma: createOfertaDto.turma
         }
       });
-      /* if (ofertaExistente === null) {
-        console.log(" Não existe Existe oferta")
-
-      } else {
-        console.log("Existe oferta")
-      } */
       return ofertaExistente;
     } catch (error) {
-      console.log(error);
       throw new BadRequestException("Erro ao tentar buscar por uma oferta!");
     }
 
