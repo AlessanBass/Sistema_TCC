@@ -152,6 +152,21 @@ export class DisciplinaService {
     }
   }
 
+ async findOneCodAndCurso(cod: string, nome_disciplina:string, id_curso: number){
+  try {
+    return this.prisma.disciplina.findFirst({
+      where: {
+        cod: cod,
+        nome_disciplina: nome_disciplina,
+        curso_id_curso: id_curso
+      }
+    });
+
+  } catch (error) {
+    throw new BadRequestException("Erro ao buscar por disciplina");
+  }
+ }
+
   async findOneCod(cod: string) {
     /* Se não encontrar o retorno é NULL */
     /* Posso passar um parametro opcional como por exemplo a turma */

@@ -5,13 +5,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class OfertaService {
-  constructor(private readonly prisma: PrismaService){}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(createOfertaDto: CreateOfertaDto) {
-   const ofertaExistente = await this.verificaEquals(createOfertaDto);
-   if(ofertaExistente){
-    return null;
-   }
+    console.log("entrei aqui na oferta");
+    const ofertaExistente = await this.verificaEquals(createOfertaDto);
+    if (ofertaExistente) {
+      return null;
+    }
     try {
       return this.prisma.oferta.create({
         data: {
@@ -31,13 +32,13 @@ export class OfertaService {
   async findAll() {
     try {
       return this.prisma.oferta.findMany({
-        include:{
-          disciplina:true,
+        include: {
+          disciplina: true,
           area: true,
-          semestre:true
+          semestre: true
         },
-        orderBy:{
-          disciplina:{
+        orderBy: {
+          disciplina: {
             nome_disciplina: 'asc'
           }
         }
@@ -59,33 +60,45 @@ export class OfertaService {
     }
   }
 
-  async verificaEquals(createOfertaDto: CreateOfertaDto){
-    const ofertaExistente = await this.prisma.oferta.findFirst({
-      where: {
-        disciplina_id_disciplina: (+createOfertaDto.disciplina_id_disciplina),
-        turma: createOfertaDto.turma
-      }
-    });
+  async verificaEquals(createOfertaDto: CreateOfertaDto) {
+    try {
+      console.log("Verifica Equals: ");
+      const ofertaExistente = await this.prisma.oferta.findFirst({
+        where: {
+          disciplina_id_disciplina: (+createOfertaDto.disciplina_id_disciplina),
+          turma: createOfertaDto.turma
+        }
+      });
+      /* if (ofertaExistente === null) {
+        console.log(" Não existe Existe oferta")
 
-     return ofertaExistente;
+      } else {
+        console.log("Existe oferta")
+      } */
+      return ofertaExistente;
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException("Erro ao tentar buscar por uma oferta!");
+    }
+
   }
 
-  async findByArea(id_area: number){
+  async findByArea(id_area: number) {
     try {
       return this.prisma.oferta.findMany({
-        orderBy:{
-          disciplina:{
+        orderBy: {
+          disciplina: {
             nome_disciplina: 'asc'
           }
         },
-        where:{
-          area_id_area:id_area
+        where: {
+          area_id_area: id_area
         },
-        include:{
-          disciplina:{
-            include:{
-              area:true,
-              curso:true,
+        include: {
+          disciplina: {
+            include: {
+              area: true,
+              curso: true,
             }
           }
         }
@@ -95,18 +108,18 @@ export class OfertaService {
     }
   }
 
-  async findByDisciplinaAndTurma(disciplina: string, turma: string){
+  async findByDisciplinaAndTurma(disciplina: string, turma: string) {
     try {
       let oferta = await this.prisma.oferta.findFirst({
-        where:{
-          disciplina:{
-            nome_disciplina:disciplina
-          },  
+        where: {
+          disciplina: {
+            nome_disciplina: disciplina
+          },
           turma: turma
         }
       });
 
-      if(!oferta){
+      if (!oferta) {
         return null
       }
 

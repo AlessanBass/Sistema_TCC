@@ -95,15 +95,19 @@ export class EnvioOfertaService {
     for (let i = 1; i < data.length; i++) {
       const item = data[i];
       let area = await this.findArea(item);
-      let disciplina = await this.findDisciplina(item);
       let curso = await this.findCurso(item);
+      let disciplina = await this.findDisciplina(item, curso.id_curso);
       let semestre = await this.findSemestre(item); /* Retona o ultimo semestre inserido */
       /* Aqui eu creio uma oferta */
-      if (disciplina && curso && semestre && area) {
+      
+      if (disciplina && curso && semestre && area) { 
         if (item.column6 === undefined) {
           item.column6 = "SEM TURMA";
         }
 
+        if (typeof item.column6 === 'number') {
+          item.column6 = item.column6.toString();
+        }
         if (item.column11 === undefined) {
           item.column11 = null
         }
@@ -124,7 +128,7 @@ export class EnvioOfertaService {
           semestre_id_semestre: semestre.id_semestre,
           area_id_area: area.id_area,
         }
-        await this.createOferta(newOfeta);
+        let retorno = await this.createOferta(newOfeta);
       } else { /* Aqui eu crio uma disciplina */
         /* Falta criar curso, area e semstre, caso não existam ainda */
         let periodo = item.column1;
@@ -148,6 +152,10 @@ export class EnvioOfertaService {
         } else {
           if (item.column6 === undefined) {
             item.column6 = "SEM TURMA"
+          }
+
+          if (typeof item.column6 === 'number') {
+            item.column6 = item.column6.toString();
           }
 
           if (item.column11 === undefined) {
@@ -200,9 +208,8 @@ export class EnvioOfertaService {
     }
   }
 
-  async findDisciplina(item: any) {
-    /* vou buscar pelo código da disciplina */
-    let disciplina = await this._disciplina.findOneCod(item.column2);
+  async findDisciplina(item: any, id_curso: number) {
+    let disciplina = await this._disciplina.findOneCodAndCurso(item.column2.trim(), item.column3.trim(), id_curso);
     if (disciplina === null || disciplina === undefined) {
       return null;
     } else {
@@ -249,54 +256,54 @@ export class EnvioOfertaService {
     }
   }
 
-  async finOneSemestre(id_semestre: number){
+  async finOneSemestre(id_semestre: number) {
     return this._semestre.findOne(id_semestre);
   }
 
-  async finOneArea(id_area: number){
+  async finOneArea(id_area: number) {
     return this._area.findOne(id_area);
   }
 
-    async download(id_area: number, id_semestre: number) {
-      const area = await this._area.findOne(id_area);
-      const semestre = await this._semestre.findOne(id_semestre);
-      const ofertas = await this._oferta.findByArea(id_area);
+  async download(id_area: number, id_semestre: number) {
+    const area = await this._area.findOne(id_area);
+    const semestre = await this._semestre.findOne(id_semestre);
+    const ofertas = await this._oferta.findByArea(id_area);
 
-      /* Nome do nosso arquivo */
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet(`Indicação ${semestre.nome_semestre} - ${area.nome_area}`);
+    /* Nome do nosso arquivo */
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet(`Indicação ${semestre.nome_semestre} - ${area.nome_area}`);
 
-      /* Adicionar cabeçalhos na minha tabela */
-      let headers = [
-        {header:'CÓD', key: 'id', width:10 },
-        {header:'DISCIPLINA', key: 'disciplina', width:50 },
-        {header:'CH', key: 'ch', width:10 },
-        {header:'CHs', key: 'chs', width:10 },
-        {header:'TURMA', key: 'turma', width:15 },
-        {header:'B ou L', key: 'boul', width:20 },
-        {header:'CURSO', key: 'curso', width:30 },
-        {header:'PROFESSOR', key: 'professor', width:60 },
-        {header:'ÁREA', key: 'area', width:30 },
-        {header:'FORMANDOS', key: 'formandos', width:30 },
-        {header:'OBSERVAÇÕES', key: 'obs', width:70 },
-      ];
+    /* Adicionar cabeçalhos na minha tabela */
+    let headers = [
+      { header: 'CÓD', key: 'id', width: 10 },
+      { header: 'DISCIPLINA', key: 'disciplina', width: 50 },
+      { header: 'CH', key: 'ch', width: 10 },
+      { header: 'CHs', key: 'chs', width: 10 },
+      { header: 'TURMA', key: 'turma', width: 15 },
+      { header: 'B ou L', key: 'boul', width: 20 },
+      { header: 'CURSO', key: 'curso', width: 30 },
+      { header: 'PROFESSOR', key: 'professor', width: 60 },
+      { header: 'ÁREA', key: 'area', width: 30 },
+      { header: 'FORMANDOS', key: 'formandos', width: 30 },
+      { header: 'OBSERVAÇÕES', key: 'obs', width: 70 },
+    ];
 
-      worksheet.columns = headers;
+    worksheet.columns = headers;
 
-      /* Aplicando estilo */
-      worksheet.getRow(1).eachCell((cell) => {
-        cell.alignment = { vertical: 'middle', horizontal: 'center' };
-        cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }; // Cor da fonte branca
-        cell.fill = {
-          type: 'pattern',
-          pattern:'solid',
-          fgColor:{argb:'FF0000FF'} // Cor de fundo azul
-        };
-      });
-      
+    /* Aplicando estilo */
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }; // Cor da fonte branca
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF0000FF' } // Cor de fundo azul
+      };
+    });
 
-      /* Adicionar os dados a planilha */
-      ofertas.forEach(oferta => {
+
+    /* Adicionar os dados a planilha */
+    ofertas.forEach(oferta => {
       /*  console.log(`COD: ${oferta.disciplina.cod}`);
         console.log(`DISCIPLINA: ${oferta.disciplina.nome_disciplina}`);
         console.log(`CH: ${oferta.disciplina.carga_horaria}`);
@@ -308,22 +315,22 @@ export class EnvioOfertaService {
         console.log(`FORMANDOS: ${oferta.formandos}`);
         console.log(`OBS: ${oferta.obs_colegiado}`);
         console.log("--------------------------------------------------") */
-        worksheet.addRow({
-          id: oferta.disciplina.cod,
-          disciplina: oferta.disciplina.nome_disciplina,
-          ch: oferta.disciplina.carga_horaria,
-          chs: oferta.disciplina.qtd_creditos,
-          turma: oferta.turma,
-          boul: oferta.disciplina.curso.tipo_curso,
-          curso: oferta.disciplina.curso.nome_curso,
-          professor: " ",
-          area: oferta.disciplina.area.nome_area,
-          formandos: oferta.formandos,
-          obs: oferta.obs_colegiado,
-        });
+      worksheet.addRow({
+        id: oferta.disciplina.cod,
+        disciplina: oferta.disciplina.nome_disciplina,
+        ch: oferta.disciplina.carga_horaria,
+        chs: oferta.disciplina.qtd_creditos,
+        turma: oferta.turma,
+        boul: oferta.disciplina.curso.tipo_curso,
+        curso: oferta.disciplina.curso.nome_curso,
+        professor: " ",
+        area: oferta.disciplina.area.nome_area,
+        formandos: oferta.formandos,
+        obs: oferta.obs_colegiado,
       });
+    });
 
-      const buffer = await workbook.xlsx.writeBuffer();
-      return buffer;
-    }
+    const buffer = await workbook.xlsx.writeBuffer();
+    return buffer;
+  }
 }

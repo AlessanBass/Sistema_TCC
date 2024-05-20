@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import * as ExcelJS from 'exceljs';
 import { unlink, writeFile } from 'fs/promises';
 import { ProfessorService } from 'src/professor/professor.service';
@@ -8,6 +8,7 @@ import { AlocacaoService } from 'src/alocacao/alocacao.service';
 import { OfertaService } from 'src/oferta/oferta.service';
 import { SemestreService } from 'src/semestre/semestre.service';
 import { CursoService } from 'src/curso/curso.service';
+import { throwError } from 'rxjs';
 
 interface Alocacao {
   oferta_id_oferta: number;
@@ -75,8 +76,10 @@ export class EnvioIndicacaoService {
       // Adicionar os dados da linha ao array de dados
       data.push(rowData);
     });
+
+    /* console.log(data); */
     await this.excelDataProcessing(data);
-    /* Jogar essa isso de apagar em uma função */
+    /* Jogar essa isso de apagar em uma função */ 
     try {
       await unlink(path);
       console.log('Arquivo excluído com sucesso');
@@ -91,10 +94,37 @@ export class EnvioIndicacaoService {
       let area = await this.findArea(item);
       let professor = await this.findProfessor(item);
       let oferta = await this.findOferta(item);
+      let disciplina = await this.findDisciplina(item);
+      console.log(item.column2);
 
-      /* Criando uma alocação Preciso tratar isso aqui  */
+      /* 
+        Se essa oferta ainda não existir eu crio a OFERTA!
+
+        1° Verificar se o professor existe (Caso não eu salvo ele) depois tento criar a oferta!
+        2° Verificar se disciplina existe! (Caso não, crio ela) depois tento a oferta
+      */
       if (!oferta) {
-        console.log('Erro na oferta, por favor fazer a inserção no banco');
+        if(professor){
+          console.log(`Professor: ${item.column8} existe!`);
+        }else{
+          console.log(`Preciso criar: Professor: ${item.column8} `);
+        }
+
+        if(disciplina){
+          console.log(`Disciplina: ${item.column2} existe!`);
+        }else{
+          console.log(`Preciso Criar: Disciplina: ${item.column2} existe!`);
+        }
+
+        if(professor && disciplina){
+          console.log("preciso criar uma oferta");
+
+          /* 
+          
+            Existe disciplinas de curso diferentes, porém com o mesmo nome e codigo
+             caso de eletroeletronica, preciso verificar no banco de de dados depois
+          */
+        }
       }
 
 
@@ -111,6 +141,7 @@ export class EnvioIndicacaoService {
         }
 
       } else {
+        console.log("to passando aqui!");
         /* Adiciono o professor no banco */
         let newProfessor = {
           nomeProfessor: item.column8.trim().toUpperCase(),
@@ -118,6 +149,7 @@ export class EnvioIndicacaoService {
         }
 
         let retorno = await this.createProfessor(newProfessor);
+        /* console.log("Retorno: " + retorno.nome_professor); */
         if (retorno) {
           if (oferta) {
             let newAlocacao = {
@@ -275,4 +307,5 @@ export class EnvioIndicacaoService {
     const buffer = await workbook.xlsx.writeBuffer();
     return buffer;
   }
+
 }
