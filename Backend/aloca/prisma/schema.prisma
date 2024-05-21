@@ -37,7 +37,7 @@ model disciplina {
   id_disciplina   Int      @id @unique(map: "id_disciplina_UNIQUE") @default(autoincrement())
   periodo         Int
   cod             String   @db.VarChar(20)
-  nome_disciplina String   @db.VarChar(100)
+  nome_disciplina String   @db.VarChar(300)
   carga_horaria   Int
   qtd_creditos    Int
   curso_id_curso  Int
