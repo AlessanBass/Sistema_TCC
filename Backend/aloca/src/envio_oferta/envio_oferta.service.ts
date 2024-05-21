@@ -92,6 +92,9 @@ export class EnvioOfertaService {
   }
 
   async excelDataProcessing(data: any[]) {
+    if(data[0].column1.trim().toUpperCase() === "PERÍODO"){
+      console.log("Entrei aqui");
+    
     for (let i = 1; i < data.length; i++) {
       const item = data[i];
       let area = await this.findArea(item);
@@ -182,6 +185,141 @@ export class EnvioOfertaService {
         }
       }
     }
+  }else{
+    console.log("Não tem periodo");
+    for (let i = 1; i < data.length; i++) {
+      const item = data[i];
+
+       /* Verificar disciplinas que estõa sem código */
+       if(item.column1 === null || item.column1 === undefined ){
+        /* Retornoar um erro no array */
+        console.log(`linha: ${i} Entrei aquie em: ${item.column2}`);
+        continue;
+      }
+
+      console.log(`COD: ${item.column1}`);
+      console.log(`Disciplina: ${item.column2}`);
+      console.log(`Turma: ${item.column5}`);
+      console.log(`Curso: ${item.column7}`);
+      console.log(`Area: ${item.column9}`);
+      console.log(`Qtd_creditos: ${item.column4}`);
+      let area = await this.findArea(item);
+      let curso = await this.findCurso2(item);
+      console.log(`ID CURSO: ${curso.id_curso}`);
+      console.log(`-------------------------------`);
+      let disciplina = await this.findDisciplina2(item, curso.id_curso);
+      let semestre = await this.findSemestre(item); /* Retona o ultimo semestre inserido */
+      
+      if (disciplina && curso && semestre && area) { 
+        console.log("Paseei aqui disciplina existe " + disciplina.nome_disciplina);
+        if (item.column5 === undefined) {
+          item.column5 = "SEM TURMA";
+        }
+
+        if (typeof item.column5 === 'number') {
+          item.column5 = item.column5.toString();
+        }
+        if (item.column10 === undefined) {
+          item.column10 = null
+        }
+
+        if (item.column11 === undefined) {
+          item.column11 = null
+        }
+
+        if (typeof item.column10 === 'number') {
+          item.column10 = item.column10.toString();
+        }
+
+        /* Verifica tipo RichText */
+        if(item.column11 && item.column11.richText){
+           item.column11 = item.column11.richText.map(part => part.text).join('');
+        }
+        
+        let newOfeta = {
+          turma: item.column5,
+          formandos: item.column10,
+          obs_colegiados: item.column11,
+          disciplina_id_disciplina: disciplina.id_disciplina,
+          semestre_id_semestre: semestre.id_semestre,
+          area_id_area: area.id_area,
+        }
+       /*  console.log(newOfeta); */
+       console.log("Passei aqui em oferta");
+        let retorno = await this.createOferta(newOfeta);
+      } else { /* Aqui eu crio uma disciplina */
+        /* Falta criar curso, area e semstre, caso não existam ainda */
+       console.log("Preciso criar a disciplina: " + item.column2);
+        let periodo = 0;
+        if (typeof periodo === 'string') {
+          periodo = 100;
+        }
+
+        if(item.column4 === null || item.column4 === undefined || Number.isNaN(item.column4) || typeof item.column4 === 'object'){
+         /*  console.log('Entrei aqui'); */
+          /* console.log(item.column4); */
+          item.column4 = item.column4.result;
+          console.log(item.column4);
+        }
+
+        let newDisciplina = {
+          periodo: periodo,
+          cod: item.column1,
+          nome_disciplina: item.column2,
+          carga_horaria: (+item.column3),
+          qtd_creditos: (+item.column4),
+          curso_id_curso: curso.id_curso,
+          area_id_area: area.id_area,
+        }
+
+       /*  console.log(newDisciplina); */
+        /* Colocar isso em uma função */  
+
+        console.log("Paseei aqui antes de criar a disciplina " + item.column2);
+        console.log(newDisciplina);
+        let retorno = await this.createDisciplina(newDisciplina);
+        
+        if (!retorno) {
+          console.log(`erro ao salavar a disciplina ${newDisciplina.nome_disciplina}`);
+        } else {
+          if (item.column5 === undefined) {
+            item.column5 = "SEM TURMA"
+          }
+
+          if (typeof item.column5 === 'number') {
+            item.column5 = item.column5.toString();
+          }
+          /* formandos */
+          if (item.column10 === undefined) {
+            item.column10 = null
+          }
+          /* Obseservações */
+          if (item.column11 === undefined) {
+            item.column11 = null
+          }
+
+          if (typeof item.column10 === 'number') {
+            item.column10 = item.column10.toString();
+          }
+
+          /* Verifica tipo RichText */
+        if(item.column11 && item.column11.richText){
+          item.column11 = item.column11.richText.map(part => part.text).join('');
+       }
+
+          let newOfeta = {
+            turma: item.column5,
+            formandos: item.column10, 
+            obs_colegiados: item.column11,
+            disciplina_id_disciplina: retorno.id_disciplina,
+            semestre_id_semestre: semestre.id_semestre,
+            area_id_area: retorno.area_id_area,
+          }
+          await this.createOferta(newOfeta);
+        }
+      }
+    }
+    }
   }
 
   async createOferta(newOferta: Oferta) {
@@ -217,10 +355,21 @@ export class EnvioOfertaService {
     }
   }
 
+  async findDisciplina2(item: any, id_curso: number) {
+    
+    let disciplina = await this._disciplina.findOneCodAndCurso(item.column1.trim(), item.column2.trim(), id_curso);
+    if (disciplina === null || disciplina === undefined) {
+      return null;
+    } else {
+      return disciplina;
+    }
+  }
+
   async findCurso(item: any) {
     let cursoExcel = item.column8.split(' ');
+    let tamanho = cursoExcel.length;
     if (cursoExcel.length >= 2) {
-      let curso = await this._curso.getContains(cursoExcel[1]);
+      let curso = await this._curso.getContains(cursoExcel[tamanho-1]);
       if (curso.length >= 1) {
         return curso[0];
       }
@@ -232,6 +381,22 @@ export class EnvioOfertaService {
     }
   }
 
+  async findCurso2(item: any) {
+    let cursoExcel = item.column7.split(' ');
+    let tamanho = cursoExcel.length;
+    if (cursoExcel.length >= 2) {
+      let curso = await this._curso.getContains(cursoExcel[tamanho-1]);
+      if (curso.length >= 1) {
+        return curso[0];
+      }
+    } else {
+      let curso = await this._curso.findByNome(cursoExcel[0]);
+      if (curso.length >= 1) {
+        return curso[0];
+      }
+    }
+  }
+/* Reaproveitado */
   async findSemestre(item: any) {
     let semestre = await this._semestre.findLatest();
     if (semestre == null || semestre === undefined) {
@@ -240,7 +405,7 @@ export class EnvioOfertaService {
       return semestre;
     }
   }
-
+/* Reaproveitado */
   async findArea(item: any) {
     let areaExcel = item.column9.split(' ');
     if (areaExcel.length >= 2) {

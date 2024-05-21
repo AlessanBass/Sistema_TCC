@@ -1,42 +1,70 @@
+import React from 'react';
+import { useDropzone } from 'react-dropzone';
 import Header from "@/components/Header";
 import { Button } from '@mui/material';
+import style from '@/styles/dropzone.module.css'
 import axios from "axios";
-import { useRef } from "react";
 
-export default function Index(){
-    const fileInput = useRef<HTMLInputElement>(null);
+export default function Index() {
+    const [file, setFile] = React.useState<File | null>(null);
+    const [fileSelected, setFileSelected] = React.useState(false);
+
+    const onDrop = React.useCallback((acceptedFiles: File[]) => {
+        if (acceptedFiles.length) {
+            setFile(acceptedFiles[0]);
+            setFileSelected(true);
+        }
+    }, []);
+
+    const { getRootProps, getInputProps,open, acceptedFiles } = useDropzone({
+        onDrop,
+        accept: {
+            'application/vnd.ms-excel': ['.xls'],
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx']
+        },
+        noClick:true,
+        maxFiles: 1
+    });
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (fileInput.current?.files) {
+        if (file) {
             const formData = new FormData();
-            formData.append('file', fileInput.current.files[0]);
+            formData.append('file', file);
 
             try {
-                const response = await axios.post('http://localhost:3000/oferta/uploadOferta', formData, {
+                const response = await axios.post('http://localhost:3000/envio-oferta/uploadOferta', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
                 });
-                /* console.log(response); retorna 201*/
+                if (response.status === 201) {
+                    console.log("O envio deu certo baby");
+                }
             } catch (error) {
                 console.error(error);
             }
         }
     }
-    
 
-    return(
-        <div> {/* Trocar essa div para main */}
-            <Header title="Upload Oferta de Disciplinas"/>
-            <h1>Aqui vai ter um form</h1>
-            <form onSubmit={handleSubmit}>
-                <input type="file" name="upload_oferta" id="excel_oferta" accept=".xls,.xlsx" ref={fileInput} />
-                <Button variant="contained" color="primary" type="submit">
+    return (
+        <main >
+            <Header title="Upload Oferta de Disciplinas" />
+            <h2 className={`${style.titlePage}`}>Oferta de Disciplinas</h2>
+            <form onSubmit={handleSubmit} className={`${style.form}`}>
+                <div {...getRootProps()} className={`${style.containeDropZone}`}>
+                    <input {...getInputProps()}  />
+                    <i className={`fa-solid fa-paper-plane ${style.icon}`}></i>
+                    <p  className={`${style.p}`}>Você pode arrastar seu arquivo ou clicar no botão.</p>
+                    <button className={`${style.buttonSelect}`} type="button" onClick={open}>
+                        Selecionar Arquivo
+                    </button>
+                </div>
+                {fileSelected && <p className={`${style.pArquivoSelecionado}`}><span className={`${style.spanArquivo}`}>Arquivo selecionado:</span> {file?.name} </p>}
+                <Button className={`${style.buttonUpload}`} variant="contained" color="primary" type="submit" disabled={!fileSelected}>
                     Upload
                 </Button>
             </form>
-        </div>
-        
+        </main>
     );
 }

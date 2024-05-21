@@ -1,0 +1,89 @@
+.form{
+   /*  border: 1px solid blue; */
+    padding: 10px;
+    margin: 0 auto;
+    width: 60%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    background-color: white;
+    box-shadow: 0px 0px 5px black;
+    border-radius: 8px;
+}
+
+.titlePage{
+    margin: 20px auto 20px auto;
+    text-align: center;
+    background-color: rgb(5, 5, 105);
+    color: white;
+    border-radius: 20px;
+    padding: 10px;
+    width: 30%;
+    text-transform: uppercase;
+}
+
+.icon{
+    text-align: center;
+    padding: 10px;
+    font-size: 2.8em;
+    /* opacity: 0.6; */
+    /* color: rgb(4, 4, 99); */
+    color: #09456c;
+    
+}
+
+.containeDropZone{
+    /* border: 1px solid red; */
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.p{
+    padding: 10px;
+    font-size: 1.1em;
+    font-family: "Oswald", sans-serif;
+}
+
+.buttonSelect{
+    padding: 5px 10px 5px 10px;
+    font-family: "Oswald", sans-serif;
+    font-weight: 400;
+    text-transform: capitalize;
+    font-size: 1.1em;
+    background-color: #09456c;
+    color: white;
+    border: none;
+    border-radius: 5px 10px 5px 10px;
+    cursor: pointer;
+    transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+}
+
+.buttonSelect:hover{
+    background-color: rgb(4, 4, 99);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* transform: scale(1.1); */
+
+}
+.pArquivoSelecionado{
+    padding: 10px;
+    margin-bottom: 10px;
+  /*   background-color: #09456c; */
+}
+
+.spanArquivo{
+    background-color: #09456c;
+    padding: 5px 10px 5px 10px;
+    color: white;
+    border-radius: 5px;
+}
+
+.buttonUpload{
+    margin-bottom: 10px;
+    margin-top: 10px;
+}

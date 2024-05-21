@@ -8,7 +8,6 @@ export class OfertaService {
   constructor(private readonly prisma: PrismaService) { }
 
   async create(createOfertaDto: CreateOfertaDto) {
-    console.log("entrei aqui na oferta");
     const ofertaExistente = await this.verificaEquals(createOfertaDto);
     if (ofertaExistente) {
       return null;

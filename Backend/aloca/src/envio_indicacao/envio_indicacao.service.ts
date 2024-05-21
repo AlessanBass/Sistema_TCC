@@ -92,10 +92,17 @@ export class EnvioIndicacaoService {
     for (let i = 1; i < data.length; i++) {
       const item = data[i];
       let area = await this.findArea(item);
+      let curso = await this.findCurso(item);
       let professor = await this.findProfessor(item);
       let oferta = await this.findOferta(item);
-      let disciplina = await this.findDisciplina(item);
-      console.log(item.column2);
+      let disciplina = await this.findDisciplina(item, curso.id_curso);
+      /* console.log(item.colum2) */
+
+      if(disciplina){
+        console.log(`Disciplina: ${disciplina.nome_disciplina} existe!`);
+      }else{
+        console.log(`Disciplina: ${item.column2} ainda não existe!`);
+      }
 
       /* 
         Se essa oferta ainda não existir eu crio a OFERTA!
@@ -103,7 +110,7 @@ export class EnvioIndicacaoService {
         1° Verificar se o professor existe (Caso não eu salvo ele) depois tento criar a oferta!
         2° Verificar se disciplina existe! (Caso não, crio ela) depois tento a oferta
       */
-      if (!oferta) {
+      /* if (!oferta) {
         if(professor){
           console.log(`Professor: ${item.column8} existe!`);
         }else{
@@ -118,14 +125,8 @@ export class EnvioIndicacaoService {
 
         if(professor && disciplina){
           console.log("preciso criar uma oferta");
-
-          /* 
-          
-            Existe disciplinas de curso diferentes, porém com o mesmo nome e codigo
-             caso de eletroeletronica, preciso verificar no banco de de dados depois
-          */
         }
-      }
+      } */
 
 
       if (area && professor && oferta) {
@@ -141,28 +142,42 @@ export class EnvioIndicacaoService {
         }
 
       } else {
-        console.log("to passando aqui!");
-        /* Adiciono o professor no banco */
-        let newProfessor = {
-          nomeProfessor: item.column8.trim().toUpperCase(),
-          area_id_area: area.id_area,
-        }
+        console.log("Entrei aqui em: "+ item.column2);
+        /* 
+          Se o professor não existe eu crio,
+          verifico se existe oferta.
+        */
+        if(!professor){
+          let newProfessor = {
+            nomeProfessor: item.column8.trim().toUpperCase(),
+            area_id_area: area.id_area,
+          }
+          let professor = await this.createProfessor(newProfessor);
 
-        let retorno = await this.createProfessor(newProfessor);
-        /* console.log("Retorno: " + retorno.nome_professor); */
-        if (retorno) {
-          if (oferta) {
-            let newAlocacao = {
-              oferta_id_oferta: oferta.id_oferta,
-              professor_id_professor: retorno.id_professor
-            }
-            try {
-              await this.createAlocacao(newAlocacao, item.column5.trim());
-            } catch (error) {
-              throw new BadRequestException("Erro ao criar alocacao");
+          if (professor) {
+            if (oferta) {
+              let newAlocacao = {
+                oferta_id_oferta: oferta.id_oferta,
+                professor_id_professor: professor.id_professor
+              }
+              try {
+                await this.createAlocacao(newAlocacao, item.column5.trim());
+              } catch (error) {
+                throw new BadRequestException("Erro ao criar alocacao");
+              }
             }
           }
+        }else{
+          console.log('Professor naõ existe ainda: ' + item.colum8);
         }
+
+        /* Verifica se existe a oferta */
+        if(!oferta){
+          console.log(`Preciso criar oferta para a disci: ${disciplina.nome_disciplina}`);
+        }
+       
+        /* console.log("Retorno: " + retorno.nome_professor); */
+        
       }
     }
   }
@@ -183,6 +198,7 @@ export class EnvioIndicacaoService {
       }
       return retorno;
     } catch (error) {
+      console.log(error);
       throw new BadRequestException(`Erro ao tentar criar o professor: ${newProfessor.nomeProfessor}`);
     }
   }
@@ -223,13 +239,17 @@ export class EnvioIndicacaoService {
     return retorno;
   }
 
-  async findDisciplina(item: any) {
-    let retorno = await this._disciplina.findOneCod(item.column1.trim());
-
+  async findDisciplina(item: any, id_curso: number) {
+    try {
+      let retorno = await this._disciplina.findOneCodAndCurso(item.column1.trim(), item.colum2.trim(), id_curso);
     if (retorno === null || retorno === undefined) {
       return null;
     }
     return retorno;
+    } catch (error) {
+      /* console.log(error); */
+    }
+    
   }
 
   async finOneSemestre(id_semestre: number){
@@ -238,6 +258,21 @@ export class EnvioIndicacaoService {
 
   async findOneCurso(id_colegiado: number){
     return this._curso.findOne(id_colegiado);
+  }
+
+  async findCurso(item: any) {
+    let cursoExcel = item.column7.split(' ');
+    if (cursoExcel.length >= 2) {
+      let curso = await this._curso.getContains(cursoExcel[1]);
+      if (curso.length >= 1) {
+        return curso[0];
+      }
+    } else {
+      let curso = await this._curso.findByNome(cursoExcel[0]);
+      if (curso.length >= 1) {
+        return curso[0];
+      }
+    }
   }
 
   async download(id_colegiado: number, id_semestre: number) {
