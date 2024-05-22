@@ -1,5 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import * as ExcelJS from 'exceljs';
+import * as XLSX from 'xlsx';
+import { promises as fs } from 'fs';
 import { unlink, writeFile } from 'fs/promises';
 import { AreaService } from 'src/area/area.service';
 import { CursoService } from 'src/curso/curso.service';
@@ -56,18 +58,40 @@ export class EnvioOfertaService {
 
   async readExecel(file: Express.Multer.File, path: string) {
     await this.upload(file, path); /* Espera escrever o */
-    const workbook = new ExcelJS.Workbook();
-    try {
-      await workbook.xlsx.readFile(path);
-    } catch (error) {
-      throw new BadRequestException('Erro ao ler o arquivo Excel: ' + error.message);
+    const extension = file.originalname.split('.').pop();
+    let workbook;
+
+    if (extension === 'xlsx') {
+      workbook = new ExcelJS.Workbook();
+      try {
+        await workbook.xlsx.readFile(path);
+      } catch (error) {
+        throw new BadRequestException('Erro ao ler o arquivo Excel: ' + error.message);
+      }
+    } else if (extension === 'xls') {
+      try {
+        const buffer = await fs.readFile(path);
+        const xlsWorkbook = XLSX.read(buffer, { type: 'buffer' });
+        workbook = new ExcelJS.Workbook();
+        const sheetData = XLSX.utils.sheet_to_json(xlsWorkbook.Sheets[xlsWorkbook.SheetNames[0]], { header: 1 });
+
+        const sheet = workbook.addWorksheet('Sheet1');
+        sheetData.forEach((row: any[]) => {
+          sheet.addRow(row);
+        });
+      } catch (error) {
+        throw new BadRequestException('Erro ao ler o arquivo Excel: ' + error.message);
+      }
+    } else {
+      throw new BadRequestException('Formato de arquivo não suportado');
     }
+
 
     // Obtendo a primeira planilha
     const sheet = workbook.getWorksheet(1);
 
     // Array para armazenar os dados da planilha
-    const data = [];
+    const data = []; 
 
     sheet.eachRow((row, rowNum) => {
       // Objeto para armazenar os dados de uma linha

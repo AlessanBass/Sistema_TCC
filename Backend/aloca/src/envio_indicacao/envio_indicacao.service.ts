@@ -1,5 +1,7 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import * as ExcelJS from 'exceljs';
+import * as XLSX from 'xlsx';
+import { promises as fs } from 'fs';
 import { unlink, writeFile } from 'fs/promises';
 import { ProfessorService } from 'src/professor/professor.service';
 import { AreaService } from 'src/area/area.service';
@@ -53,12 +55,34 @@ export class EnvioIndicacaoService {
 
   async readExecel(file: Express.Multer.File, path: string) {
     await this.upload(file, path); /* Espera escrever o */
-    const workbook = new ExcelJS.Workbook();
-    try {
-      await workbook.xlsx.readFile(path);
-    } catch (error) {
-      throw new BadRequestException('Erro ao ler o arquivo Excel: ' + error.message);
+    const extension = file.originalname.split('.').pop();
+    let workbook;
+
+    if (extension === 'xlsx') {
+      workbook = new ExcelJS.Workbook();
+      try {
+        await workbook.xlsx.readFile(path);
+      } catch (error) {
+        throw new BadRequestException('Erro ao ler o arquivo Excel: ' + error.message);
+      }
+    } else if (extension === 'xls') {
+      try {
+        const buffer = await fs.readFile(path);
+        const xlsWorkbook = XLSX.read(buffer, { type: 'buffer' });
+        workbook = new ExcelJS.Workbook();
+        const sheetData = XLSX.utils.sheet_to_json(xlsWorkbook.Sheets[xlsWorkbook.SheetNames[0]], { header: 1 });
+
+        const sheet = workbook.addWorksheet('Sheet1');
+        sheetData.forEach((row: any[]) => {
+          sheet.addRow(row);
+        });
+      } catch (error) {
+        throw new BadRequestException('Erro ao ler o arquivo Excel: ' + error.message);
+      }
+    } else {
+      throw new BadRequestException('Formato de arquivo não suportado');
     }
+
 
     // Obtendo a primeira planilha
     const sheet = workbook.getWorksheet(1);
@@ -114,7 +138,7 @@ export class EnvioIndicacaoService {
       console.log(`Formandos: ${item.column10}`);
       console.log(`Obs: ${item.column11}`);
       console.log(`---------------------------------`); */
-      console.log(`Paseei aqi nalinha: ${(i+1)}`);
+      console.log(`Paseei aqi nalinha: ${(i + 1)}`);
       /* Preciso tratar tbm linhas apenas com dados como total de créditos */
       if ((item.column1 === undefined || typeof item.column1 === 'object') && (item.column2 === undefined || typeof item.column2 === 'object')) {
         continue;
@@ -127,7 +151,7 @@ export class EnvioIndicacaoService {
         item.column5 = item.column5.toString();
       }
       /* Remove espaços caso haja no código */
-      if(item.column1.includes(' ')){
+      if (item.column1.includes(' ')) {
         item.column1 = item.column1.split(' ').join('');
       }
 
@@ -148,7 +172,7 @@ export class EnvioIndicacaoService {
       if (oferta) {
         console.log(`Oferta existe: ${item.column2} turma: ${item.column5}`);
       } else {
-        console.log(`Linha: ${(i+1)} Oferta Não existe: ${item.column2} turma: ${item.column5}`);
+        console.log(`Linha: ${(i + 1)} Oferta Não existe: ${item.column2} turma: ${item.column5}`);
         let linha = i;
         let newErro: Erro = {
           linha: linha + 1,
@@ -158,7 +182,7 @@ export class EnvioIndicacaoService {
           detalhe: "Por favor, forneça um valor"
         }
         erros.push(newErro);
-        continue;  
+        continue;
       }
       /* let disciplina = await this.findDisciplina(item, curso.id_curso);
       if (disciplina) {
@@ -198,7 +222,7 @@ export class EnvioIndicacaoService {
         }
         let professor = await this.createProfessor(newProfessor);
 
-       /*  if(!oferta){continue;} */
+        /*  if(!oferta){continue;} */
         /* Agora eu crio a alocação! */
         let newAlocacao = {
           oferta_id_oferta: oferta.id_oferta,
