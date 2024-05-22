@@ -124,8 +124,8 @@ export class EnvioOfertaService {
           }
           erros.push(newErro);
           continue;
-        } /* ccertos: 360, 357, 177 */
-
+        }
+        
         /* Verifica se a disciplina tá Qtd_créditos */
         if (item.column5 === null || item.column5 === undefined || typeof item.column5 === 'object') {
           let linha = i;
@@ -154,7 +154,7 @@ export class EnvioOfertaService {
           continue;
         }
 
-        /* Verifica se tem curso alocado */ 
+        /* Verifica se tem curso alocado */
         if (item.column8 === null || item.column8 === undefined || typeof item.column8 === 'object') {
           let linha = i;
           let newErro: Erro = {
@@ -170,7 +170,7 @@ export class EnvioOfertaService {
 
         let area = await this.findArea(item);
         let curso = await this.findCurso(item);
-         /* Verifica se o curso existe ou não */
+        /* Verifica se o curso existe ou não */
         if (!curso) {
           let linha = i;
           let newErro: Erro = {
@@ -185,7 +185,6 @@ export class EnvioOfertaService {
         }
         let disciplina = await this.findDisciplina(item, curso.id_curso);
         let semestre = await this.findSemestre(item); /* Retona o ultimo semestre inserido */
-        
         /* Aqui eu creio uma oferta */
         if (disciplina && curso && semestre && area) {
           if (item.column6 === undefined) {
@@ -296,7 +295,7 @@ export class EnvioOfertaService {
           }
           erros.push(newErro);
           continue;
-        } /* ccertos: 360, 357, 177 */
+        } 
 
         /* Verifica se a disciplina tá Qtd_créditos */
         if (item.column4 === null || item.column4 === undefined || typeof item.column4 === 'object') {

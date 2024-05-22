@@ -10,7 +10,8 @@ export class ProfessorService {
   async create(createProfessorDto: CreateProfessorDto) {
     const existingProfessor = await this.prisma.professor.findFirst({ where: { nome_professor: createProfessorDto.nomeProfessor } });
     if (existingProfessor) {
-      throw new ConflictException('Já existe um professor com esse nome');
+     /*  throw new ConflictException('Já existe um professor com esse nome'); */
+     return null;
     }
 
     /* Cria um novo professor */
@@ -176,12 +177,12 @@ export class ProfessorService {
 
   async findByName(name: string){
     try {
-      let professor = this.prisma.professor.findFirst({
+      let professor = await this.prisma.professor.findFirst({
         where:{
           nome_professor:name
         }
       });
-
+      /* console.log(professor); */
       if(!professor){
         return null
       }
