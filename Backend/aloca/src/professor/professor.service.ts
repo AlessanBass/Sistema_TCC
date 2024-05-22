@@ -10,14 +10,15 @@ export class ProfessorService {
   async create(createProfessorDto: CreateProfessorDto) {
     const existingProfessor = await this.prisma.professor.findFirst({ where: { nome_professor: createProfessorDto.nomeProfessor } });
     if (existingProfessor) {
-      throw new ConflictException('Já existe um professor com esse nome');
+     /*  throw new ConflictException('Já existe um professor com esse nome'); */
+     return null;
     }
 
     /* Cria um novo professor */
     try {
       return this.prisma.professor.create({
         data: {
-          nome_professor: createProfessorDto.nomeProfessor,
+          nome_professor: createProfessorDto.nomeProfessor.toUpperCase(),
           observacoes: createProfessorDto.observacoes,
           area_id_area: (+createProfessorDto.area_id_area)
         },
@@ -68,7 +69,16 @@ export class ProfessorService {
     try {
       return this.prisma.professor.findUnique({
         include: {
-          area: true,
+          area:true,
+          alocacao:{
+            include:{
+              oferta:{
+                include:{
+                  disciplina:true
+                }
+              }
+            }
+          }
         },
         where: { id_professor: id }
       });
@@ -94,7 +104,7 @@ export class ProfessorService {
      try {
        return this.prisma.professor.update({
          data: {
-          nome_professor: updateProfessorDto.nomeProfessor,
+          nome_professor: updateProfessorDto.nomeProfessor.toUpperCase(),
           observacoes: updateProfessorDto.observacoes,
           area_id_area: (+updateProfessorDto.area_id_area)
          },
@@ -167,12 +177,12 @@ export class ProfessorService {
 
   async findByName(name: string){
     try {
-      let professor = this.prisma.professor.findFirst({
+      let professor = await this.prisma.professor.findFirst({
         where:{
           nome_professor:name
         }
       });
-
+      /* console.log(professor); */
       if(!professor){
         return null
       }

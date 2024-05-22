@@ -22,13 +22,21 @@ interface Disciplina {
     area_id_area: number;
 }
 
+interface Oferta{
+    turma?: string | null;
+    formandos?: string | null;
+    obs_colegiados?: string | null;
+    disciplina_id_disciplina: number;
+    semestre_id_semestre: number;
+    area_id_area: number;
+    disciplina: Disciplina;
+}
+
 interface Alocacao {
     id_alocacao: number;
-    observacoes_colegiado: string | null;
-    disciplina_id_disciplina: number;
+    oferta_id_oferta: number;
     professor_id_professor: number;
-    semestre_id_semestre: number;
-    disciplina: Disciplina;
+    oferta: Oferta;
 }
 
 interface Area {
@@ -71,12 +79,12 @@ export default function TableViewProfessor({professores} :propsModal) {
                 <TableBody>
                         {professores && professores.alocacao.map((alocacao) =>(
                             <TableRow key={alocacao.id_alocacao} className={`${styles.tableRow}`} sx={{ fontFamily: '"Oswald", sans-serif'}}>
-                                <TableCell>{alocacao.disciplina.periodo}</TableCell>
-                                <TableCell>{alocacao.disciplina.cod}</TableCell>
-                                <TableCell>{alocacao.disciplina.nome_disciplina}</TableCell>
-                                <TableCell>{alocacao.disciplina.carga_horaria}</TableCell>
-                                <TableCell>{alocacao.disciplina.qtd_creditos}</TableCell>
-                                <TableCell>{alocacao.disciplina.turma}</TableCell>
+                                <TableCell>{alocacao.oferta.disciplina.periodo}</TableCell>
+                                <TableCell>{alocacao.oferta.disciplina.cod}</TableCell>
+                                <TableCell>{alocacao.oferta.disciplina.nome_disciplina}</TableCell>
+                                <TableCell>{alocacao.oferta.disciplina.carga_horaria}</TableCell>
+                                <TableCell>{alocacao.oferta.disciplina.qtd_creditos}</TableCell>
+                                <TableCell>{alocacao.oferta.disciplina.turma}</TableCell>
                             </TableRow>
                         ))}
                 </TableBody>

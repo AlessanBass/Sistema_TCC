@@ -38,13 +38,21 @@ interface Disciplina {
     area_id_area: number;
 }
 
+interface Oferta{
+    turma?: string | null;
+    formandos?: string | null;
+    obs_colegiados?: string | null;
+    disciplina_id_disciplina: number;
+    semestre_id_semestre: number;
+    area_id_area: number;
+    disciplina: Disciplina;
+}
+
 interface Alocacao {
     id_alocacao: number;
-    observacoes_colegiado: string | null;
-    disciplina_id_disciplina: number;
+    oferta_id_oferta: number;
     professor_id_professor: number;
-    semestre_id_semestre: number;
-    disciplina: Disciplina;
+    oferta: Oferta;
 }
 
 interface Area {

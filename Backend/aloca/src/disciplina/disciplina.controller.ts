@@ -22,6 +22,11 @@ export class DisciplinaController {
     return this.disciplinaService.findOne(+id);
   }
 
+  @Get('findByCodAndCurso/:cod/:nameDisciplina/:idCurso')
+  async findByCodAndCurso(@Param('id') cod: string, @Param('nameDisciplina') nameDisciplina: string, @Param('idCurso') idCurso: string){
+      return this.disciplinaService.findOneCodAndCurso(cod, nameDisciplina, +idCurso);
+  }
+
   @Get('cod/:cod')
   async findOneCod(@Param('cod') cod: string){
     return this.disciplinaService.findOneCod(cod);
