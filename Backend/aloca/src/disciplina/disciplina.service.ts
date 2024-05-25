@@ -60,6 +60,24 @@ export class DisciplinaService {
     }
   }
 
+  async findDisciplinaByCurso(id_curso : number){
+    try {
+      return await this.prisma.disciplina.findMany({
+        where:{
+          area_id_area: id_curso,
+          curso_id_curso: id_curso
+        },
+        orderBy:{
+          nome_disciplina: 'asc'
+        }
+      });
+      
+    } catch (error) {
+      /* console.log(error); */
+      throw new BadRequestException("Erro ao buscar as disciplinas por curso");
+    }
+  }
+
   async findOne(id: number) {
     try {
       const disciplina = await this.prisma.disciplina.findUnique({

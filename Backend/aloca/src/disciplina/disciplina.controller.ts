@@ -17,6 +17,12 @@ export class DisciplinaController {
     return this.disciplinaService.findAll();
   }
 
+  @Get('curso/:idCurso')
+  async findDisciplinaByCurso(@Param('idCurso') id_curso: string){
+    return this.disciplinaService.findDisciplinaByCurso(+id_curso);
+  }
+
+
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.disciplinaService.findOne(+id);
