@@ -60,23 +60,36 @@ export class DisciplinaService {
     }
   }
 
-  async findDisciplinaByCurso(id_curso : number){
+  async findDisciplinaByCurso(id_curso: number, skip: number, take: number) {
     try {
-      return await this.prisma.disciplina.findMany({
-        where:{
-          area_id_area: id_curso,
-          curso_id_curso: id_curso
-        },
-        orderBy:{
-          nome_disciplina: 'asc'
-        }
-      });
-      
+        const [total, disciplinas] = await this.prisma.$transaction([
+            this.prisma.disciplina.count({
+                where: {
+                    area_id_area: id_curso,
+                    curso_id_curso: id_curso
+                },
+            }),
+            this.prisma.disciplina.findMany({
+                where: {
+                    area_id_area: id_curso,
+                    curso_id_curso: id_curso
+                },
+                orderBy: {
+                    nome_disciplina: 'asc'
+                },
+                skip: skip,
+                take: take
+            })
+        ]);
+
+        return { total, disciplinas };
     } catch (error) {
-      /* console.log(error); */
-      throw new BadRequestException("Erro ao buscar as disciplinas por curso");
+      console.log(error);
+        throw new BadRequestException("Erro ao buscar as disciplinas por curso");
     }
-  }
+}
+
+
 
   async findOne(id: number) {
     try {
