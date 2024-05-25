@@ -110,7 +110,7 @@ export class EnvioIndicacaoService {
     });
 
     /* console.log(data); */
-    await this.excelDataProcessing(data);
+    const erros = await this.excelDataProcessing(data);
     /* Jogar essa isso de apagar em uma função */
     try {
       await unlink(path);
@@ -118,6 +118,9 @@ export class EnvioIndicacaoService {
     } catch (error) {
       console.error('Erro ao excluir o arquivo:', error);
     }
+
+    // Retornar os erros encontrados
+     return erros;
   }
 
   async excelDataProcessing(data: any[]) {
@@ -143,6 +146,21 @@ export class EnvioIndicacaoService {
       if ((item.column1 === undefined || typeof item.column1 === 'object') && (item.column2 === undefined || typeof item.column2 === 'object')) {
         continue;
       }
+
+      /* Verifica disciplinas que estão sem código */
+      if (item.column1 === null || item.column1 === undefined || typeof item.column1 === 'object') {
+        /* Retornoar um erro no array */
+        let linha = i;
+        let newErro: Erro = {
+          linha: linha + 1,
+          mensagem: "Disciplinha de encontra sem o código",
+          valor_celular: "undefined",
+          tipo_esperado: "string",
+          detalhe: "Por favor, forneça um valor"
+        }
+        erros.push(newErro);
+        continue;
+      } 
       /* Verificar se a coluna curso é undefined ou null */
       if (item.column5 === undefined) {
         item.column5 = "SEM TURMA"
@@ -153,6 +171,19 @@ export class EnvioIndicacaoService {
       /* Remove espaços caso haja no código */
       if (item.column1.includes(' ')) {
         item.column1 = item.column1.split(' ').join('');
+      }
+       /* Verifica se tem curso alocado */
+       if (item.column7 === null || item.column7 === undefined || typeof item.column7 === 'object') {
+        let linha = i;
+        let newErro: Erro = {
+          linha: linha + 1,
+          mensagem: "Coluna Curso de encontra vazia",
+          valor_celular: "undefined",
+          tipo_esperado: "String",
+          detalhe: "Por favor, forneça um valor"
+        }
+        erros.push(newErro);
+        continue;
       }
 
 
@@ -232,8 +263,9 @@ export class EnvioIndicacaoService {
         await this.createAlocacao(newAlocacao, item.column5.trim());
       }
     }
-    console.log("------ ERROS ----------");
-    console.log(erros);
+    /* console.log("------ ERROS ----------");
+    console.log(erros); */
+    return erros;
   }
 
   async createAlocacao(newAlocacao: Alocacao, turma: string) {
