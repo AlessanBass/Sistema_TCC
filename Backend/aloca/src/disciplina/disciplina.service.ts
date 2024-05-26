@@ -2,6 +2,7 @@ import { BadRequestException, ConflictException, Injectable, InternalServerError
 import { CreateDisciplinaDto } from './dto/create-disciplina.dto';
 import { UpdateDisciplinaDto } from './dto/update-disciplina.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UpdateAlocacaoDto } from 'src/alocacao/dto/update-alocacao.dto';
 
 @Injectable()
 export class DisciplinaService {
@@ -16,6 +17,7 @@ export class DisciplinaService {
         cod: createDisciplinaDto.cod
       }
     });
+
     if (existingDisciplinaForCurso) {
       throw new ConflictException(`Já existe uma disciplina com esse nome ${createDisciplinaDto.nome_disciplina} para o curso especificado`);
     }
@@ -96,28 +98,25 @@ export class DisciplinaService {
   }
 
   async update(id: number, updateDisciplinaDto: UpdateDisciplinaDto) {
-    /* Verifica se a disciplina existe */
-    const disciplina = await this.prisma.disciplina.findUnique({ where: { id_disciplina: id } });
-    if (!disciplina) {
-      throw new NotFoundException("Disciplina não encontrada");
-    }
 
-    /* Verifica se já existe uma disciplina com o novo nome */
-    if (updateDisciplinaDto.nome_disciplina != undefined) {
-      const existingDisciplinaByName = await this.prisma.disciplina.findFirst({ where: { nome_disciplina: updateDisciplinaDto.nome_disciplina } });
-      if (existingDisciplinaByName && existingDisciplinaByName.id_disciplina !== id) {
-        throw new ConflictException("Já existe uma disciplina com esse nome!");
-      }
-    }
-
+    
+    
     /* Verifica se já existe uma disciplina com o novo código */
-    if (updateDisciplinaDto.cod != undefined) {
-      const existingDisciplinaByCod = await this.prisma.disciplina.findFirst({ where: { cod: updateDisciplinaDto.cod } });
-      if (existingDisciplinaByCod && existingDisciplinaByCod.id_disciplina !== id) {
-        throw new ConflictException("Já existe uma disciplina com esse código!");
-      }
-    }
+      const existingDisciplina = await this.prisma.disciplina.findFirst({
+        where: {
+          cod: updateDisciplinaDto.cod,
+          nome_disciplina: updateDisciplinaDto.nome_disciplina,
+          curso_id_curso: (+updateDisciplinaDto.curso_id_curso),
+          NOT:{
+            id_disciplina:id
+          }
+        },
+      });
 
+      console.log(existingDisciplina);
+      if (existingDisciplina) {
+        throw new ConflictException("Já existe uma disciplina com esse código e nome em outro curso!");
+      }
 
     /* Atualiza a disciplina */
     try {
@@ -128,10 +127,10 @@ export class DisciplinaService {
         dataToUpdate.periodo = +updateDisciplinaDto.periodo;
       }
       if (updateDisciplinaDto.cod !== undefined) {
-        dataToUpdate.cod = updateDisciplinaDto.cod;
+        dataToUpdate.cod = updateDisciplinaDto.cod.trim().toUpperCase();
       }
       if (updateDisciplinaDto.nome_disciplina !== undefined) {
-        dataToUpdate.nome_disciplina = updateDisciplinaDto.nome_disciplina;
+        dataToUpdate.nome_disciplina = updateDisciplinaDto.nome_disciplina.trim().toUpperCase();
       }
       if (updateDisciplinaDto.carga_horaria !== undefined) {
         dataToUpdate.carga_horaria = +updateDisciplinaDto.carga_horaria;

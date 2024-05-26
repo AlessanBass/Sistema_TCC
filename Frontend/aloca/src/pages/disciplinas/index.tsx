@@ -9,6 +9,11 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TablePagination from '@mui/material/TablePagination';
 import styles from '@/styles/table.module.css';
+import style from '@/styles/dropzone.module.css'
+import disciplinaStyles from '@/styles/disciplinas.module.css';
+import ModalDisciplinaCreate from "@/components/ModalDisciplinaCreate";
+import Confirmacao from "@/components/Confirmacao";
+import ModalDisciplinaEdit from "@/components/ModalDisciplinaEdit";
 
 interface Disciplina {
     id_disciplina: number;
@@ -28,11 +33,18 @@ interface Area {
 
 export default function Index() {
     const [disciplinas, setDisciplinas] = React.useState<Disciplina[] | null>(null);
+    const [disciplinaModalEdita, setDisciplinaEdit] = React.useState<Disciplina | null>(null); // Ajustado aqui
     const [areas, setAreas] = React.useState<Area[]>();
+    const [description, setDescription] = React.useState("");
+    const [openConfirmation, setOpenConfirmation] = React.useState(false);
+    const [openModalEdit, setOpenModalEdit] = React.useState(false);
+    const [id_disciplina, setIdDisicplina] = React.useState(Number);
     const [selectedArea, setSelectedArea] = React.useState<number | undefined>();
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [totalDisciplinas, setTotalDisciplinas] = React.useState(0);
+    const handleOpenEdit = () => setOpenModalEdit(true);
+    const handleCloseEdit = () => setOpenModalEdit(false);
 
     React.useEffect(() => {
         const fetchAreas = async () => {
@@ -59,13 +71,43 @@ export default function Index() {
                     setDisciplinas(response.data.disciplinas.length ? response.data.disciplinas : null);
                     setTotalDisciplinas(response.data.total);
                 } catch (error) {
-                    console.log(error);
+                    /* console.log(error); */
                     setDisciplinas(null);
                 }
             }
         };
         fetchDisciplinas();
-    }, [selectedArea, page, rowsPerPage]);
+    }, [selectedArea, page, rowsPerPage, disciplinas]);
+
+    const handleClick = async (id_disciplina: number, acao:number) =>{
+        if(acao === 3){
+            deleteDisciplina(+id_disciplina)
+        }
+        
+        if(acao === 2){
+            setIdDisicplina(+id_disciplina);
+            handleOpenEdit(); 
+            try {
+                const response = await axios.get(`http://localhost:3000/disciplina/${id_disciplina}`);
+                setDisciplinaEdit(response.data);  
+            } catch (error) {
+                alert('Ocorreu um erro eo tentar abrir o modal de editar disciplina');
+            }
+            
+        }
+    }
+
+    const deleteDisciplina = async (id_disciplina: number) =>{
+        try {
+            const response = await axios.delete(`http://localhost:3000/disciplina/${id_disciplina}`);
+            if(response.status === 200){
+                setDescription("Disciplina deletada com sucesso!");
+                setOpenConfirmation(true);  
+            }
+        } catch (error) {
+            alert('Ocorreu um erro ao deletar a disciplina');
+        }
+    }
 
     const handleAreaChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedArea(Number(event.target.value));
@@ -83,10 +125,12 @@ export default function Index() {
     };
 
     return (
-        <div>
+        <div className={`${disciplinaStyles.main}`}>
             <Header title="Gestão de Disciplinas" />
-            <form>
-                <select name="area" id="area" onChange={handleAreaChange}>
+            <h2 className={`${style.titlePage}`}>Filtar Disciplinas por curso</h2>
+            <ModalDisciplinaCreate/>
+            <form className={`${disciplinaStyles.form}`}>
+                <select name="area" id="area" onChange={handleAreaChange} className={`${disciplinaStyles.Select}`}>
                     <option value="">Selecione uma área</option>
                     {areas?.map((area: Area) => (
                         <option key={area.id_area} value={area.id_area}>
@@ -96,12 +140,12 @@ export default function Index() {
                 </select>
             </form>
             {selectedArea === undefined ? (
-                <p>Selecione uma área para ver as disciplinas.</p>
+                <p className={`${disciplinaStyles.p}`}>Selecione uma área para ver as disciplinas.</p>
             ) : disciplinas === null ? (
-                <p>O curso selecionado não possui nenhuma disciplina cadastrada.</p>
+                <p className={`${disciplinaStyles.p}`}>O curso selecionado não possui nenhuma disciplina cadastrada.</p>
             ) : (
-                <>
-                    <TableContainer>
+                <div className={`${disciplinaStyles.divTable}`}>
+                    <TableContainer className={`${disciplinaStyles.tabelContainner}`}>
                         <Table>
                             <TableHead>
                                 <TableRow>
@@ -121,15 +165,16 @@ export default function Index() {
                                         <TableCell sx={{ fontFamily: '"Oswald", sans-serif', fontSize: '1em' }}>{disciplina.qtd_creditos}</TableCell>
                                         <TableCell>
                                             <div className={`${styles.containerAcoes}`}>
-                                                <i className={`fa-solid fa-eye ${styles.iconAcoes} ${styles.iconsAcoesGeral} ${styles.iconsEye}`}></i>
-                                                <i className={`fa-solid fa-pen ${styles.iconAcoes} ${styles.iconsAcoesGeral} ${styles.iconsPen}`}></i>
-                                                <i className={`fa-solid fa-trash ${styles.iconsAcoesGeral} ${styles.iconsTrash}`}></i>
+                                                <i onClick={() => handleClick(disciplina.id_disciplina, 2)} className={`fa-solid fa-pen ${styles.iconAcoes} ${styles.iconsAcoesGeral} ${styles.iconsPen}`}></i>
+                                                <i onClick={() => handleClick(disciplina.id_disciplina, 3)} className={`fa-solid fa-trash ${styles.iconsAcoesGeral} ${styles.iconsTrash}`}></i>
                                             </div>
                                         </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
                         </Table>
+                            <Confirmacao open={openConfirmation} setOpen={setOpenConfirmation} description={description}/>
+                            {disciplinaModalEdita ? <ModalDisciplinaEdit openModalEdit={openModalEdit} handleCloseEdit={handleCloseEdit} id_disciplina={id_disciplina} disciplina={disciplinaModalEdita}/> : null}
                     </TableContainer>
                     <TablePagination
                         component="div"
@@ -138,8 +183,9 @@ export default function Index() {
                         onPageChange={handleChangePage}
                         rowsPerPage={rowsPerPage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
+                        className={`${disciplinaStyles.tablePagination}`}
                     />
-                </>
+                </div>
             )}
         </div>
     );
