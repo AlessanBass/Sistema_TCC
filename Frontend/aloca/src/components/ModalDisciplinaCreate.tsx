@@ -4,7 +4,9 @@ import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
+import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
+import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import axios from 'axios';
 import { TextField, FormControl, InputLabel, MenuItem, Button, SelectChangeEvent, Select } from '@mui/material';
 import Confirmacao from './Confirmacao';
@@ -32,6 +34,18 @@ const style = {
     overflowY: 'auto',
     borderRadius: '10px',
 };
+
+
+/* toltipo customozadi */
+const CustomTooltip = styled(({ className, ...props }: TooltipProps) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: 'green', // Defina a cor de fundo como verde
+        color: 'white', // Defina a cor do texto como branca
+        fontSize: 14, // Ajuste o tamanho da fonte conforme necessário
+    },
+}));
 
 export default function ModalDisciplinaCreate() {
     const [open, setOpen] = React.useState(false);
@@ -122,7 +136,7 @@ export default function ModalDisciplinaCreate() {
 
         } catch (error) {
             console.log(error);
-          /*   setOpen(false); */
+            /*   setOpen(false); */
             setOpenConfirmation(true);
             setDescription("Erro ao criar a Disciplina! Verifique o nome e o código da disciplina");
         }
@@ -132,7 +146,10 @@ export default function ModalDisciplinaCreate() {
     return (
         <div>
             <div className={`${disciplinaStyles.containnerButton}`}>
-                <Button onClick={handleOpen} className={`${disciplinaStyles.posision}`}>Criar Nova Disciplina</Button>
+                <CustomTooltip title="Adicionar nova disciplina" placement="left">
+                    <Button onClick={handleOpen} className={`${disciplinaStyles.posision}`}>+</Button>
+                </CustomTooltip>
+
             </div>
             <Modal
                 aria-labelledby="transition-modal-title"
