@@ -6,6 +6,7 @@ import style from '@/styles/dropzone.module.css'
 import axios from "axios";
 import RelatorioErros from '@/components/RelatorioErros';
 import Confirmacao from '@/components/Confirmacao';
+import Footer from '@/components/Footer';
 
 interface Erro {
     linha: number;
@@ -113,6 +114,7 @@ export default function Index() {
             )}
 
             <Confirmacao open={openConfirmation} setOpen={setOpenConfirmation} description={description} />
+            <Footer/>
         </main>
     );
 }
