@@ -1,0 +1,83 @@
+.containerDiv {
+    border: 1px solid red;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.Select {
+    font-size: 1em;
+    padding: 10px;
+    border: 1px solid #007BFF;
+    text-transform: capitalize;
+    border-radius: 4px;
+    -webkit-appearance: none;
+    /* Remove o estilo padrão do select em alguns navegadores */
+    -moz-appearance: none;
+    /* Remove o estilo padrão do select em alguns navegadores */
+    appearance: none;
+    /* Remove o estilo padrão do select em alguns navegadores */
+}
+
+
+.Select:focus {
+    outline: none;
+    border-color: #0056b3;
+}
+
+.p {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tabelContainner {
+    width: 100%;
+    margin: 0 auto;
+
+}
+
+.posision {
+    color: white;
+    font-weight: 700;
+    background-color: rgb(10, 182, 10);
+    font-size: 1em;
+    border-radius: 360px;
+    padding: 10px 10px 10px 10px;
+}
+
+.posision:hover {
+    background-color: rgb(6, 102, 6);
+}
+
+.containnerButton {
+    padding: 10px;
+    /*  display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 10px; */
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px;
+}
+
+.tablePagination {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.divTable {
+    padding: 10px;
+    background-color: white;
+    width: 70%;
+    margin: 0 auto;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}

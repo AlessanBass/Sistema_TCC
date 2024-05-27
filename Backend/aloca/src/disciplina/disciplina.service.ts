@@ -2,36 +2,25 @@ import { BadRequestException, ConflictException, Injectable, InternalServerError
 import { CreateDisciplinaDto } from './dto/create-disciplina.dto';
 import { UpdateDisciplinaDto } from './dto/update-disciplina.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UpdateAlocacaoDto } from 'src/alocacao/dto/update-alocacao.dto';
 
 @Injectable()
 export class DisciplinaService {
   constructor(private readonly prisma: PrismaService) { }
 
   async create(createDisciplinaDto: CreateDisciplinaDto) {
-    /* const existingDisciplina = await this.prisma.disciplina.findFirst({ where: { nome_disciplina: createDisciplinaDto.nome_disciplina } });
-    if (existingDisciplina) {
-      throw new ConflictException(`Já existe uma disciplina com esse nome ${createDisciplinaDto.nome_disciplina}`);
-    }
-
-    // Verifica se já existe uma disciplina com o mesmo código
-    const existingDisciplinaByCod = await this.prisma.disciplina.findFirst({
-      where: { cod: createDisciplinaDto.cod }
-    });
-    if (existingDisciplinaByCod) {
-      throw new ConflictException(`Já existe uma disciplina com esse Cod ${createDisciplinaDto.nome_disciplina}`);
-    } */
-
     // Verifica se já existe uma disciplina para o curso especificado
-  const existingDisciplinaForCurso = await this.prisma.disciplina.findFirst({
-    where: { 
-      curso_id_curso: (+createDisciplinaDto.curso_id_curso), 
-      nome_disciplina: createDisciplinaDto.nome_disciplina,
-      cod: createDisciplinaDto.cod
+    const existingDisciplinaForCurso = await this.prisma.disciplina.findFirst({
+      where: {
+        curso_id_curso: (+createDisciplinaDto.curso_id_curso),
+        nome_disciplina: createDisciplinaDto.nome_disciplina,
+        cod: createDisciplinaDto.cod
+      }
+    });
+
+    if (existingDisciplinaForCurso) {
+      throw new ConflictException(`Já existe uma disciplina com esse nome ${createDisciplinaDto.nome_disciplina} para o curso especificado`);
     }
-  });
-  if (existingDisciplinaForCurso) {
-    throw new ConflictException(`Já existe uma disciplina com esse nome ${createDisciplinaDto.nome_disciplina} para o curso especificado`);
-  }
 
 
     /* Cria a nova disciplina */
@@ -60,6 +49,37 @@ export class DisciplinaService {
     }
   }
 
+  async findDisciplinaByCurso(id_curso: number, skip: number, take: number) {
+    try {
+      const [total, disciplinas] = await this.prisma.$transaction([
+        this.prisma.disciplina.count({
+          where: {
+            area_id_area: id_curso,
+            curso_id_curso: id_curso
+          },
+        }),
+        this.prisma.disciplina.findMany({
+          where: {
+            area_id_area: id_curso,
+            curso_id_curso: id_curso
+          },
+          orderBy: {
+            nome_disciplina: 'asc'
+          },
+          skip: skip,
+          take: take
+        })
+      ]);
+
+      return { total, disciplinas };
+    } catch (error) {
+      console.log(error);
+      throw new BadRequestException("Erro ao buscar as disciplinas por curso");
+    }
+  }
+
+
+
   async findOne(id: number) {
     try {
       const disciplina = await this.prisma.disciplina.findUnique({
@@ -78,28 +98,25 @@ export class DisciplinaService {
   }
 
   async update(id: number, updateDisciplinaDto: UpdateDisciplinaDto) {
-    /* Verifica se a disciplina existe */
-    const disciplina = await this.prisma.disciplina.findUnique({ where: { id_disciplina: id } });
-    if (!disciplina) {
-      throw new NotFoundException("Disciplina não encontrada");
-    }
 
-    /* Verifica se já existe uma disciplina com o novo nome */
-    if(updateDisciplinaDto.nome_disciplina != undefined){
-        const existingDisciplinaByName = await this.prisma.disciplina.findFirst({ where: { nome_disciplina: updateDisciplinaDto.nome_disciplina } });
-        if (existingDisciplinaByName && existingDisciplinaByName.id_disciplina !== id) {
-          throw new ConflictException("Já existe uma disciplina com esse nome!");
-        }
-    }
+    
     
     /* Verifica se já existe uma disciplina com o novo código */
-    if(updateDisciplinaDto.cod != undefined){
-      const existingDisciplinaByCod = await this.prisma.disciplina.findFirst({ where: { cod: updateDisciplinaDto.cod } });
-      if (existingDisciplinaByCod && existingDisciplinaByCod.id_disciplina !== id) {
-        throw new ConflictException("Já existe uma disciplina com esse código!");
-      }
-    }
+      const existingDisciplina = await this.prisma.disciplina.findFirst({
+        where: {
+          cod: updateDisciplinaDto.cod,
+          nome_disciplina: updateDisciplinaDto.nome_disciplina,
+          curso_id_curso: (+updateDisciplinaDto.curso_id_curso),
+          NOT:{
+            id_disciplina:id
+          }
+        },
+      });
 
+      console.log(existingDisciplina);
+      if (existingDisciplina) {
+        throw new ConflictException("Já existe uma disciplina com esse código e nome em outro curso!");
+      }
 
     /* Atualiza a disciplina */
     try {
@@ -110,10 +127,10 @@ export class DisciplinaService {
         dataToUpdate.periodo = +updateDisciplinaDto.periodo;
       }
       if (updateDisciplinaDto.cod !== undefined) {
-        dataToUpdate.cod = updateDisciplinaDto.cod;
+        dataToUpdate.cod = updateDisciplinaDto.cod.trim().toUpperCase();
       }
       if (updateDisciplinaDto.nome_disciplina !== undefined) {
-        dataToUpdate.nome_disciplina = updateDisciplinaDto.nome_disciplina;
+        dataToUpdate.nome_disciplina = updateDisciplinaDto.nome_disciplina.trim().toUpperCase();
       }
       if (updateDisciplinaDto.carga_horaria !== undefined) {
         dataToUpdate.carga_horaria = +updateDisciplinaDto.carga_horaria;
@@ -140,21 +157,43 @@ export class DisciplinaService {
   }
 
   async remove(id: number) {
-    /* Verifica se o curso existe */
+    // Verifica se a disciplina existe
     const disciplina = await this.findOne(id);
 
     try {
-      return this.prisma.disciplina.delete({
-        where: { id_disciplina: id }
-      });
-    } catch (e) {
-      throw new NotFoundException("Erro ao deletar disciplina");
-    }
-  }
+      // Executa a transação para deletar da oferta, alocação e depois da disciplina
+      await this.prisma.$transaction(async (prisma) => {
+        
+        // Remove todas as alocações relacionadas às ofertas dessa disciplina
+        await prisma.alocacao.deleteMany({
+          where: { 
+            oferta:{
+              disciplina_id_disciplina:id
+            }
+          },
+        });
 
- async findOneCodAndCurso(cod: string, nome_disciplina:string, id_curso: number){
+        // Remove todas as ofertas relacionadas à disciplina
+        await prisma.oferta.deleteMany({
+          where:{
+            disciplina_id_disciplina:id
+          }
+        });
+
+      // Remove a disciplina
+      await prisma.disciplina.delete({
+        where: { id_disciplina: id },
+      });
+    });
+  } catch(error) {
+    console.log(error);
+    throw new NotFoundException('Erro ao deletar disciplina');
+  }
+}
+
+ async findOneCodAndCurso(cod: string, nome_disciplina: string, id_curso: number){
   try {
-    let retorno =  this.prisma.disciplina.findFirst({
+    let retorno = this.prisma.disciplina.findFirst({
       where: {
         cod: cod,
         nome_disciplina: nome_disciplina,
@@ -166,20 +205,20 @@ export class DisciplinaService {
   } catch (error) {
     throw new BadRequestException("Erro ao buscar por disciplina");
   }
- }
+}
 
   async findOneCod(cod: string) {
-    /* Se não encontrar o retorno é NULL */
-    /* Posso passar um parametro opcional como por exemplo a turma */
-    try {
-      return this.prisma.disciplina.findFirst({
-        where: {
-          cod: cod
-        }
-      });
+  /* Se não encontrar o retorno é NULL */
+  /* Posso passar um parametro opcional como por exemplo a turma */
+  try {
+    return this.prisma.disciplina.findFirst({
+      where: {
+        cod: cod
+      }
+    });
 
-    } catch (error) {
-      throw new BadRequestException("Erro ao buscar por disciplina");
-    }
+  } catch (error) {
+    throw new BadRequestException("Erro ao buscar por disciplina");
   }
+}
 }

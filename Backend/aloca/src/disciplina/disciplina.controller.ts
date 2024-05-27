@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { DisciplinaService } from './disciplina.service';
 import { CreateDisciplinaDto } from './dto/create-disciplina.dto';
 import { UpdateDisciplinaDto } from './dto/update-disciplina.dto';
@@ -16,6 +16,15 @@ export class DisciplinaController {
   async findAll() {
     return this.disciplinaService.findAll();
   }
+
+  @Get('curso/:id')
+async getDisciplinasByCurso(@Param('id') id: number, @Query('skip') skip: number, @Query('take') take: number) {
+    const skipNumber = Number(skip) || 0;
+    const takeNumber = Number(take) || 10;
+    return this.disciplinaService.findDisciplinaByCurso(+id, +skipNumber, +takeNumber);
+}
+
+
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
