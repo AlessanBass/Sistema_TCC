@@ -4,10 +4,20 @@ import Header from "@/components/Header";
 import { Button } from '@mui/material';
 import style from '@/styles/dropzone.module.css'
 import axios from "axios";
+import RelatorioErros from '@/components/RelatorioErros';
+
+interface Erro {
+    linha: number ;
+    mensagem: string ;
+    valor_celula: string | number | null | undefined ;
+    tipo_esperado: string ;
+    detalhe: string | null;
+}
 
 export default function Index() {
     const [file, setFile] = React.useState<File | null>(null);
     const [fileSelected, setFileSelected] = React.useState(false);
+    const [erros, setErros] = React.useState<Erro []>([]);
 
     const onDrop = React.useCallback((acceptedFiles: File[]) => {
         if (acceptedFiles.length) {
@@ -40,6 +50,8 @@ export default function Index() {
                 });
                 if (response.status === 201) {
                     console.log("O envio deu certo baby");
+                    console.log(response.data);
+                    setErros(response.data);
                 }
             } catch (error) {
                 console.error(error);
@@ -65,6 +77,7 @@ export default function Index() {
                     Upload
                 </Button>
             </form>
+            {erros && erros?.length > 0 ? <RelatorioErros erros={erros}/> : null}
         </main>
     );
 }
