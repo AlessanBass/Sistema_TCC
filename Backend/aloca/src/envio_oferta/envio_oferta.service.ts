@@ -121,6 +121,8 @@ export class EnvioOfertaService {
       /* console.error('Erro ao excluir o arquivo:', error); */
     }
 
+    return erros;
+
     /*  if (erros.length > 0) {
        throw new BadRequestException(erros);
      } */

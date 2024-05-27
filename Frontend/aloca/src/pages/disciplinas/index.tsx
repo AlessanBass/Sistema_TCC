@@ -184,6 +184,7 @@ export default function Index() {
                         rowsPerPage={rowsPerPage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
                         className={`${disciplinaStyles.tablePagination}`}
+                        rowsPerPageOptions={[5,8,10]}
                     />
                 </div>
             )}
