@@ -598,7 +598,7 @@ export class EnvioOfertaService {
   async download(id_area: number, id_semestre: number) {
     const area = await this._area.findOne(id_area);
     const semestre = await this._semestre.findOne(id_semestre);
-    const ofertas = await this._oferta.findByArea(id_area);
+    const ofertas = await this._oferta.findByAreaAndSemestre(id_area, id_semestre);
 
     /* Nome do nosso arquivo */
     const workbook = new ExcelJS.Workbook();

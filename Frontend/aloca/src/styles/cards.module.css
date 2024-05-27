@@ -12,6 +12,7 @@
     flex-direction: column;
     flex-wrap: wrap;
     margin-right: 2px;
+    min-width: 350px;
    /*  justify-content: center; */
     /* align-items: center; */
 }

@@ -6,8 +6,12 @@ import Modal from '@mui/material/Modal';
 import Fade from '@mui/material/Fade';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
+import { styled } from '@mui/material/styles';
+import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import { TextField, FormControl, InputLabel, MenuItem, Button } from '@mui/material';
 import Confirmacao from './Confirmacao';
+import disciplinaStyles from '@/styles/disciplinas.module.css';
+
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -23,6 +27,17 @@ const style = {
     overflowY: 'auto',
     borderRadius: '10px',
 };
+
+/* toltipo customozadi */
+const CustomTooltip = styled(({ className, ...props }: TooltipProps) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: 'green', // Defina a cor de fundo como verde
+        color: 'white', // Defina a cor do texto como branca
+        fontSize: 14, // Ajuste o tamanho da fonte conforme necessário
+    },
+}));
 
 export default function ModalAreaCreate() {
     const [open, setOpen] = React.useState(false);
@@ -61,7 +76,11 @@ export default function ModalAreaCreate() {
 
     return (
         <div>
-            <Button onClick={handleOpen} className={`${styles.buttonModal}`}>Inserir</Button>
+            <div className={`${disciplinaStyles.containnerButton}`}>
+                <CustomTooltip title="Adicionar nova disciplina" placement="left">
+                    <Button onClick={handleOpen} className={`${disciplinaStyles.posision}`}>+</Button>
+                </CustomTooltip>
+            </div>
             <Modal
                 aria-labelledby="transition-modal-title"
                 aria-describedby="transition-modal-description"
@@ -99,7 +118,7 @@ export default function ModalAreaCreate() {
                                 />
                             </Box>
                             <Button variant="contained" color="primary" onClick={handleSubmit}>
-                                    Cadastrar
+                                Cadastrar
                             </Button>
                             <Button variant="contained" color="error" onClick={handleClose}>
                                 Fechar

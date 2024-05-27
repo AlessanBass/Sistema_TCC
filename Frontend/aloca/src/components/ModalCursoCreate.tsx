@@ -8,7 +8,9 @@ import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import { TextField, FormControl, InputLabel, MenuItem, Button } from '@mui/material';
 import Confirmacao from './Confirmacao';
-
+import { styled } from '@mui/material/styles';
+import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
+import disciplinaStyles from '@/styles/disciplinas.module.css';
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -29,6 +31,18 @@ interface Curso {
     nome_curso: string;
     tipo_curso: string;
 }
+
+
+/* toltipo customozadi */
+const CustomTooltip = styled(({ className, ...props }: TooltipProps) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: 'green', // Defina a cor de fundo como verde
+        color: 'white', // Defina a cor do texto como branca
+        fontSize: 14, // Ajuste o tamanho da fonte conforme necessário
+    },
+}));
 
 export default function ModalCursoCreate() {
     const [open, setOpen] = React.useState(false);
@@ -75,7 +89,11 @@ export default function ModalCursoCreate() {
 
     return (
         <div>
-            <Button onClick={handleOpen} className={`${styles.buttonModal}`}>Inserir</Button>
+           <div className={`${disciplinaStyles.containnerButton}`}>
+                <CustomTooltip title="Adicionar nova disciplina" placement="left">
+                    <Button onClick={handleOpen} className={`${disciplinaStyles.posision}`}>+</Button>
+                </CustomTooltip>
+            </div>
             <Modal
                 aria-labelledby="transition-modal-title"
                 aria-describedby="transition-modal-description"

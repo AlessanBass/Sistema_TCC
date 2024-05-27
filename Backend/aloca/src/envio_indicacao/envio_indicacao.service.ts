@@ -378,7 +378,7 @@ export class EnvioIndicacaoService {
   async download(id_colegiado: number, id_semestre: number) {
     const colegiado = await this._curso.findOne(id_colegiado);
     const semestre = await this._semestre.findOne(id_semestre);
-    const alocacoes = await this._alocacao.findByColegiado(id_colegiado);
+    const alocacoes = await this._alocacao.findByColegiadoBySemestre(id_colegiado, semestre.id_semestre);
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet(`Indicação ${semestre.nome_semestre}`);

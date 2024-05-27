@@ -27,6 +27,11 @@ export class OfertaController {
     return this.ofertaService.findOne(+id);
   }
 
+  @Get('find-by-area-and-semestre/:idArea/:idSemestre')
+  async findByAreaAndSemestre(@Param('idArea') id_area:string, @Param('idSemestre') id_semestre:string){
+    return this.ofertaService.findByAreaAndSemestre(+id_area, +id_semestre);
+  }
+
   @Get('find-by-area/:idArea')
   async findByArea(@Param('idArea') id_area: string){
     return this.ofertaService.findByArea(+id_area);
