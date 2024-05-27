@@ -178,4 +178,50 @@ export class AlocacaoService {
       throw new BadRequestException("Erro ao buscar alocação por colegiado!");
     }
   }
+
+  async findByColegiadoBySemestre(idColegiado: number, idSemestre: number){
+    try {
+      const retorno = await this.prisma.alocacao.findMany({
+        where:{
+          oferta:{
+            disciplina:{
+              curso:{
+                id_curso: idColegiado
+              }
+            },
+            semestre_id_semestre: idSemestre
+          }
+        },
+        include:{
+          oferta:{
+            include:{
+              disciplina:{
+                include:{
+                  curso:true
+                }
+              },
+              area:true
+            }
+          },
+          professor:true
+        },
+        orderBy:{
+          oferta:{
+            disciplina:{
+              nome_disciplina: 'asc'
+            }
+          }
+        }
+      });
+
+      if(!retorno){
+        return null;
+      }
+
+      return retorno;
+      
+    } catch (error) {
+      throw new BadRequestException("Erro ao buscar alocação por colegiado!");
+    }
+  }
 }

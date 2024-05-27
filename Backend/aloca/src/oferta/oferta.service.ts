@@ -99,6 +99,33 @@ export class OfertaService {
     }
   }
 
+  async findByAreaAndSemestre(id_area: number, id_semestre: number){
+    try {
+      return this.prisma.oferta.findMany({
+        orderBy: {
+          disciplina: {
+            nome_disciplina: 'asc'
+          }
+        },
+        where: {
+          area_id_area: id_area,
+          semestre_id_semestre: id_semestre
+        },
+        include: {
+          disciplina: {
+            include: {
+              area: true,
+              curso: true,
+            }
+          }
+        }
+      });
+      
+    } catch (error) {
+      throw new BadRequestException("Erro ao procurar pela area da oferta");
+    }
+  }
+
   async findByDisciplinaAndTurma(disciplina: string, turma: string) {
     try {
       let oferta = await this.prisma.oferta.findFirst({
