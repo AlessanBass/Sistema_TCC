@@ -1,0 +1,62 @@
+.containnerForm{
+    width: 50%;
+    padding: 10px;
+    margin: auto auto auto auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0px 0px 5px black;
+}
+
+.form{
+  /*   border: 1px solid red; */
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+
+.select {
+    font-size: 1em;
+    padding: 10px;
+    border: 1px solid #007BFF;
+    border-radius: 4px;
+    width: 60%;
+    margin-bottom: 15px;
+    -webkit-appearance: none;
+    cursor: pointer;
+    /* background-color: #09456c;
+    color: white; */
+    /* Remove o estilo padrão do select em alguns navegadores */
+    -moz-appearance: none;
+    /* Remove o estilo padrão do select em alguns navegadores */
+    appearance: none;
+    /* Remove o estilo padrão do select em alguns navegadores */
+}
+
+
+.select:hover {
+    color: white;
+    background-color: #0056b3;
+}
+
+.select:focus {
+    outline: none;
+    border-color: #0056b3;
+    background-color: white;
+    color: black;
+}
+
+.icon{
+    text-align: center;
+    padding: 10px;
+    font-size: 3em;
+    /* opacity: 0.6; */
+    /* color: rgb(4, 4, 99); */
+    color: white;
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 360px;
+    background-color: #09456c;
+    
+}
