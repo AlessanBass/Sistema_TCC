@@ -118,10 +118,11 @@ export default function MenuLateral() {
       >
         <Tabs
           orientation="vertical"
-          variant="scrollable"
           value={value}
           onChange={handleChange}
-          aria-label="Vertical tabs example"
+          variant="scrollable"
+          scrollButtons="auto"
+          aria-label="scrollable auto tabs example"
           sx={{ borderRight: 1, borderColor: 'divider' }}
 
         >
