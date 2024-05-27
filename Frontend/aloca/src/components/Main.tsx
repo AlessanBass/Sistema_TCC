@@ -7,6 +7,7 @@ export default function Main(){
             <h1 className={styles.h1}>Menu de Opções</h1>
             <main className={`${styles.main}`}>
                 <Card link="http://localhost:3001/upload_oferta" icon="fa-solid fa-upload" title="Oferta de Disciplinas" description="Enviar o arquivo com as disciplinas ofertadas"/>
+                <Card link="http://localhost:3001/upload_indicacao" icon="fa-solid fa-upload" title="Indicação de Docentes" description="Enviar o arquivo com a indicação de docentes"/>
                 <Card link="http://localhost:3001/professores" icon="fa-solid fa-chalkboard-user" title="Gestão de Professores" description="Visualizar, Editar, Inserir e Deletar"/>
                 <Card link="http://localhost:3001/cursos" icon="fa-solid fa-person-chalkboard" title="Gestão de Cursos" description="Visualizar, Editar, Inserir e Deletar"/>
                 <Card link="http://localhost:3001/semestres" icon="fa-regular fa-calendar-days" title="Gestão de Semestres" description="Visualizar, Editar, Inserir e Deletar"/>
