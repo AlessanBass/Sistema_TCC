@@ -42,6 +42,7 @@ export default function ModalSemestreCreate() {
     const [open, setOpen] = React.useState(false);
     const [nomeSemestre, setNomeSemestre] = React.useState('');
     const [openConfirmation, setOpenConfirmation] = React.useState(false);
+    const [description, setDescription] = React.useState('');
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
@@ -62,6 +63,7 @@ export default function ModalSemestreCreate() {
 
             if (response.status === 201) {
                 handleClose();
+                setDescription("Semestre criado com sucesso!");
                 setOpenConfirmation(true);
                 setNomeSemestre('');
 
@@ -69,6 +71,8 @@ export default function ModalSemestreCreate() {
                 alert('Ocorreu um erro ao realizar o cadastro.');
             }
         } catch (error) {
+            setDescription("Erro ao criar semestre! Verfique o nome do semestre.");
+            setOpenConfirmation(true);
             console.error('Erro ao realizar o cadastro:', error);
         }
     }
@@ -127,7 +131,7 @@ export default function ModalSemestreCreate() {
                     </Box>
                 </Fade>
             </Modal>
-            <Confirmacao open={openConfirmation} setOpen={setOpenConfirmation} description='Semestre Cadastrado com Sucesso!' />
+            <Confirmacao open={openConfirmation} setOpen={setOpenConfirmation} description={description} />
         </div>
     );
 }

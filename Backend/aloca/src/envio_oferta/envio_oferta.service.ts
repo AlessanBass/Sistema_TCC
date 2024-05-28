@@ -122,10 +122,6 @@ export class EnvioOfertaService {
     }
 
     return erros;
-
-    /*  if (erros.length > 0) {
-       throw new BadRequestException(erros);
-     } */
   }
 
   async excelDataProcessing(data: any[]) {
@@ -143,10 +139,10 @@ export class EnvioOfertaService {
           let linha = i;
           let newErro: Erro = {
             linha: linha + 1,
-            mensagem: "Disciplinha de encontra sem o código",
+            mensagem: "Discipplina se encontra sem o código",
             valor_celular: "undefined",
             tipo_esperado: "string",
-            detalhe: "Por favor, forneça um valor"
+            detalhe: "Por favor, revise a planilha"
           }
           erros.push(newErro);
           continue;
@@ -157,10 +153,10 @@ export class EnvioOfertaService {
           let linha = i;
           let newErro: Erro = {
             linha: linha + 1,
-            mensagem: "Disciplinha de encontra sem a quantidade de créditos",
+            mensagem: "Disciplina se encontra sem a quantidade de créditos",
             valor_celular: "undefined",
             tipo_esperado: "number",
-            detalhe: "Por favor, forneça um valor"
+            detalhe: "Por favor, revise a planilha"
           }
           erros.push(newErro);
           continue;
@@ -171,10 +167,10 @@ export class EnvioOfertaService {
           let linha = i;
           let newErro: Erro = {
             linha: linha + 1,
-            mensagem: "Disciplinha de encontra sem a carga horária",
+            mensagem: "Disciplina se encontra sem a carga horária",
             valor_celular: "undefined",
             tipo_esperado: "number",
-            detalhe: "Por favor, forneça um valor"
+            detalhe: "Por favor, revise a planilha"
           }
           erros.push(newErro);
           continue;
@@ -185,10 +181,10 @@ export class EnvioOfertaService {
           let linha = i;
           let newErro: Erro = {
             linha: linha + 1,
-            mensagem: "Coluna Curso de encontra vazia",
+            mensagem: "Coluna Curso se encontra vazia",
             valor_celular: "undefined",
             tipo_esperado: "String",
-            detalhe: "Por favor, forneça um valor"
+            detalhe: "Por favor, revise a planilha"
           }
           erros.push(newErro);
           continue;
@@ -204,7 +200,7 @@ export class EnvioOfertaService {
             mensagem: "Curso não existe",
             valor_celular: "undefined",
             tipo_esperado: "Disciplina",
-            detalhe: "Por favor, forneça um valor"
+            detalhe: "Por favor, revise a planilha"
           }
           erros.push(newErro);
           continue;
@@ -261,7 +257,7 @@ export class EnvioOfertaService {
           /* Colocar isso em uma função */
           let retorno = await this.createDisciplina(newDisciplina);
           if (!retorno) {
-            console.log(`erro ao salavar a disciplina ${newDisciplina.nome_disciplina}`);
+            /* console.log(`erro ao salavar a disciplina ${newDisciplina.nome_disciplina}`); */
           } else {
             if (item.column6 === undefined) {
               item.column6 = "SEM TURMA"
@@ -314,10 +310,10 @@ export class EnvioOfertaService {
           let linha = i;
           let newErro: Erro = {
             linha: linha + 1,
-            mensagem: "Disciplinha de encontra sem o código",
+            mensagem: "Disciplina se encontra sem o código",
             valor_celular: "undefined",
             tipo_esperado: "string",
-            detalhe: "Por favor, forneça um valor"
+            detalhe: "Por favor, revise a planilha"
           }
           erros.push(newErro);
           continue;
@@ -328,10 +324,10 @@ export class EnvioOfertaService {
           let linha = i;
           let newErro: Erro = {
             linha: linha + 1,
-            mensagem: "Disciplinha de encontra sem a quantidade de créditos",
+            mensagem: "Disciplina se encontra sem a quantidade de créditos",
             valor_celular: "undefined",
             tipo_esperado: "number",
-            detalhe: "Por favor, forneça um valor"
+            detalhe: "Por favor, revise a planilha"
           }
           erros.push(newErro);
           continue;
@@ -342,10 +338,10 @@ export class EnvioOfertaService {
           let linha = i;
           let newErro: Erro = {
             linha: linha + 1,
-            mensagem: "Disciplinha de encontra sem a carga horária",
+            mensagem: "Disciplina se encontra sem a carga horária",
             valor_celular: "undefined",
             tipo_esperado: "number",
-            detalhe: "Por favor, forneça um valor"
+            detalhe: "Por favor, revise a disciplina"
           }
           erros.push(newErro);
           continue;
@@ -359,7 +355,7 @@ export class EnvioOfertaService {
             mensagem: "Coluna Curso de encontra vazia",
             valor_celular: "undefined",
             tipo_esperado: "String",
-            detalhe: "Por favor, forneça um valor"
+            detalhe: "Por favor, revise a disciplina"
           }
           erros.push(newErro);
           continue;
@@ -374,7 +370,7 @@ export class EnvioOfertaService {
             mensagem: "Curso não existe",
             valor_celular: "undefined",
             tipo_esperado: "Disciplina",
-            detalhe: "Por favor, forneça um valor"
+            detalhe: "Por favor, revise a planilha"
           }
           erros.push(newErro);
           continue;
@@ -443,7 +439,7 @@ export class EnvioOfertaService {
           let retorno = await this.createDisciplina(newDisciplina);
 
           if (!retorno) {
-            console.log(`erro ao salavar a disciplina ${newDisciplina.nome_disciplina}`);
+           /*  console.log(`erro ao salavar a disciplina ${newDisciplina.nome_disciplina}`); */
           } else {
             if (item.column5 === undefined) {
               item.column5 = "SEM TURMA"
@@ -484,7 +480,7 @@ export class EnvioOfertaService {
         }
       }
     }
-    console.log(erros);
+   /*  console.log(erros); */
     return erros;
   }
 
