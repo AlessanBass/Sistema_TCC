@@ -64,7 +64,8 @@ export class OfertaService {
       const ofertaExistente = await this.prisma.oferta.findFirst({
         where: {
           disciplina_id_disciplina: (+createOfertaDto.disciplina_id_disciplina),
-          turma: createOfertaDto.turma
+          turma: createOfertaDto.turma,
+          semestre_id_semestre: (+createOfertaDto.semestre_id_semestre),
         }
       });
       return ofertaExistente;
@@ -126,14 +127,15 @@ export class OfertaService {
     }
   }
 
-  async findByDisciplinaAndTurma(disciplina: string, turma: string) {
+  async findByDisciplinaAndTurmaAndSemestre(disciplina: string, turma: string, id_semestre: number) {
     try {
       let oferta = await this.prisma.oferta.findFirst({
         where: {
           disciplina: {
-            nome_disciplina: disciplina
+            nome_disciplina: disciplina,
           },
-          turma: turma
+          turma: turma,
+          semestre_id_semestre: id_semestre
         }
       });
 

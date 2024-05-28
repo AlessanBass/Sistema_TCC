@@ -67,7 +67,7 @@ export default function Index() {
                 setOpenConfirmation(true);  
             }
         } catch (error) {
-            alert('Ocorreu um erro ao realizar o cadastro.');
+            alert('Ocorreu um erro ao tentar exluir um semestre');
         }
     }
 

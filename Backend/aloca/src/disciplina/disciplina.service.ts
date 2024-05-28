@@ -54,13 +54,11 @@ export class DisciplinaService {
       const [total, disciplinas] = await this.prisma.$transaction([
         this.prisma.disciplina.count({
           where: {
-            area_id_area: id_curso,
             curso_id_curso: id_curso
-          },
+          }
         }),
         this.prisma.disciplina.findMany({
           where: {
-            area_id_area: id_curso,
             curso_id_curso: id_curso
           },
           orderBy: {
