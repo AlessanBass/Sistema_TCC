@@ -63,11 +63,11 @@ export default function Index() {
         try {
             const response = await axios.delete(`http://localhost:3000/semestre/${idSemestre}`);
             if(response.status === 200){
-                setDescription("Curso deletado com sucesso!");
+                setDescription("Semestre deletado com sucesso!");
                 setOpenConfirmation(true);  
             }
         } catch (error) {
-            alert('Ocorreu um erro ao realizar o cadastro.');
+            alert('Ocorreu um erro ao tentar exluir um semestre');
         }
     }
 

@@ -9,14 +9,14 @@ export class AlocacaoService {
 
   async create(createAlocacaoDto: CreateAlocacaoDto, turma: string) {
     let retorno = await this.verificaEquals(createAlocacaoDto, turma);
-    if(retorno){
+    if (retorno) {
       return null;
     }
     try {
       let retorno = await this.prisma.alocacao.create({
         data: {
           oferta_id_oferta: (+createAlocacaoDto.oferta_id_oferta),
-          professor_id_professor:(+createAlocacaoDto.professor_id_professor)
+          professor_id_professor: (+createAlocacaoDto.professor_id_professor)
         }
       });
       if (retorno) {
@@ -24,7 +24,7 @@ export class AlocacaoService {
       } else {
         throw new Error('A resposta do Prisma não contém um ID de alocação.');
       }
-      
+
     } catch (e) {
       console.error('Erro ao cadastrar nova alocação:', e);
       throw new BadRequestException("Erro ao cadastrar nova alocação");
@@ -36,8 +36,8 @@ export class AlocacaoService {
       return this.prisma.alocacao.findMany({
         include: {
           oferta: {
-            include:{
-              disciplina:true
+            include: {
+              disciplina: true
             }
           },
           professor: true,
@@ -111,115 +111,144 @@ export class AlocacaoService {
 
   }
 
-  async verificaEquals(createAlocacaoDto: CreateAlocacaoDto, turma: string){
+  async verificaEquals(createAlocacaoDto: CreateAlocacaoDto, turmaParametro: string) {
+    // Exibir os dados de entrada para debug
+    /*  */
+    console.log('------TENTEI CRIAR A ALOCACAO------------------');
+    console.log(createAlocacaoDto);
+    console.log('------------------------------------------------');
+
+    // Buscar os dados da oferta com base no ID da oferta
+    const oferta_id_semstre = await this.prisma.oferta.findUnique({
+      where: {
+        id_oferta: (+createAlocacaoDto.oferta_id_oferta),
+      }
+    });
+
+    // Exibir o semestre_id_semestre da oferta encontrada para debug
+/*     console.log(oferta_id_semstre.semestre_id_semestre); */
+
     try {
+      // Buscar a primeira alocação que corresponda aos critérios fornecidos, excluindo a oferta atual
       const alocacaoExistente = await this.prisma.alocacao.findFirst({
-        where:{
+        where: {
           professor_id_professor: (+createAlocacaoDto.professor_id_professor),
-          oferta_id_oferta: (+createAlocacaoDto.oferta_id_oferta),
-          oferta:{
-            turma: turma
-          }
+          oferta: {
+            turma: turmaParametro,
+            semestre_id_semestre: oferta_id_semstre.semestre_id_semestre,
+            id_oferta: (+createAlocacaoDto.oferta_id_oferta)
+          },
         }
       });
 
-      if(!alocacaoExistente){
+      // Exibir a alocação encontrada para debug
+      console.log('------Alocacao já existe------------------');
+      console.log(alocacaoExistente);
+      console.log('-------------------------------------------');
+
+
+      // Retornar null se nenhuma alocação for encontrada
+      if (!alocacaoExistente) {
         return null;
       }
 
+      // Retornar a alocação encontrada
       return alocacaoExistente;
     } catch (error) {
-      throw new BadRequestException("Erro ao buscar alocacao com base na oferta e turma");
+      // Exibir o erro para debug
+      /* console.log(error); */
+      // Lançar uma exceção se ocorrer um erro durante a busca
+      throw new BadRequestException("Erro ao buscar alocação com base na oferta e turma");
     }
-    
   }
 
-  async findByColegiado(id_colegiado: number){
+
+  async findByColegiado(id_colegiado: number) {
     try {
       const retorno = await this.prisma.alocacao.findMany({
-        where:{
-          oferta:{
-            disciplina:{
-              curso:{
+        where: {
+          oferta: {
+            disciplina: {
+              curso: {
                 id_curso: id_colegiado
               }
             }
           }
         },
-        include:{
-          oferta:{
-            include:{
-              disciplina:{
-                include:{
-                  curso:true
+        include: {
+          oferta: {
+            include: {
+              disciplina: {
+                include: {
+                  curso: true
                 }
               },
-              area:true
+              area: true
             }
           },
-          professor:true
+          professor: true
         },
-        orderBy:{
-          oferta:{
-            disciplina:{
+        orderBy: {
+          oferta: {
+            disciplina: {
               nome_disciplina: 'asc'
             }
           }
         }
       });
 
-      if(!retorno){
+      if (!retorno) {
         return null;
       }
 
       return retorno;
-      
+
     } catch (error) {
       throw new BadRequestException("Erro ao buscar alocação por colegiado!");
     }
   }
 
-  async findByColegiadoBySemestre(idColegiado: number, idSemestre: number){
+  async findByColegiadoBySemestre(idColegiado: number, idSemestre: number) {
     try {
       const retorno = await this.prisma.alocacao.findMany({
-        where:{
-          oferta:{
-            disciplina:{
-              curso:{
+        where: {
+          oferta: {
+            disciplina: {
+              curso: {
                 id_curso: idColegiado
               }
             },
             semestre_id_semestre: idSemestre
           }
         },
-        include:{
-          oferta:{
-            include:{
-              disciplina:{
-                include:{
-                  curso:true
+        include: {
+          oferta: {
+            include: {
+              disciplina: {
+                include: {
+                  curso: true
                 }
               },
-              area:true
+              area: true
             }
           },
-          professor:true
+          professor: true
         },
-        orderBy:{
-          oferta:{
-            disciplina:{
+        orderBy: {
+          oferta: {
+            disciplina: {
               nome_disciplina: 'asc'
             }
           }
         }
       });
 
-      if(!retorno){
+      if (!retorno) {
         return null;
       }
 
       return retorno;
-      
+
     } catch (error) {
       throw new BadRequestException("Erro ao buscar alocação por colegiado!");
     }

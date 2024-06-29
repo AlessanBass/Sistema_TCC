@@ -81,14 +81,32 @@ export class SemestreService {
   }
 
   async remove(id: number) {
-    /* Verifica se o curso existe */
-    const semestre = await this.findOne(id);
-
     try {
-      return this.prisma.semestre.delete({
-        where: { id_semestre: id }
+      await this.prisma.$transaction(async (prisma) =>{
+       /* Remove todas as alocações */
+       await prisma.alocacao.deleteMany({
+        where:{
+          oferta:{
+            semestre_id_semestre:id
+          }
+        }
+       });
+
+        /* Remove todas as ofertas relacionadas ao semestre */
+        await prisma.oferta.deleteMany({
+          where:{
+            semestre_id_semestre: id
+          }
+        });
+
+        await prisma.semestre.delete({
+          where:{
+            id_semestre: id,
+          }
+        });
       });
     } catch (e) {
+      console.log(e);
       throw new NotFoundException("Erro ao deletar semestre");
     }
   }

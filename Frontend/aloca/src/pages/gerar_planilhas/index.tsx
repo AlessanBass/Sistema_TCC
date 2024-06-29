@@ -1,4 +1,5 @@
 import Confirmacao from "@/components/Confirmacao";
+import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import style from '@/styles/dropzone.module.css'
 import styleGenerate from '@/styles/generateExcel.module.css';
@@ -135,6 +136,7 @@ export default function Index() {
                 </form>
                 <Confirmacao open={openConfirmation} setOpen={setOpenConfirmation} description={description} />
             </div>
+                <Footer/>
         </main>
     );
 }

@@ -114,13 +114,13 @@ export class EnvioIndicacaoService {
     /* Jogar essa isso de apagar em uma função */
     try {
       await unlink(path);
-      console.log('Arquivo excluído com sucesso');
+    /*   console.log('Arquivo excluído com sucesso'); */
     } catch (error) {
-      console.error('Erro ao excluir o arquivo:', error);
+     /*  console.error('Erro ao excluir o arquivo:', error); */
     }
 
     // Retornar os erros encontrados
-     return erros;
+    return erros;
   }
 
   async excelDataProcessing(data: any[]) {
@@ -129,20 +129,7 @@ export class EnvioIndicacaoService {
 
     for (let i = 1; i < data.length; i++) {
       const item = data[i];
-      /* console.log(`COD: ${item.column1}`);
-      console.log(`Disciplina: ${item.column2}`);
-      console.log(`Carga: ${item.column3}`);
-      console.log(`Créditos: ${item.column4}`);
-      console.log(`Turma: ${item.column5}`);
-      console.log(`Tipo curso: ${item.column6}`);
-      console.log(`Curso: ${item.column7}`);
-      console.log(`Professor: ${item.column8}`);
-      console.log(`Area: ${item.column9}`);
-      console.log(`Formandos: ${item.column10}`);
-      console.log(`Obs: ${item.column11}`);
-      console.log(`---------------------------------`); */
-      console.log(`Paseei aqi nalinha: ${(i + 1)}`);
-      /* Preciso tratar tbm linhas apenas com dados como total de créditos */
+      
       if ((item.column1 === undefined || typeof item.column1 === 'object') && (item.column2 === undefined || typeof item.column2 === 'object')) {
         continue;
       }
@@ -153,14 +140,14 @@ export class EnvioIndicacaoService {
         let linha = i;
         let newErro: Erro = {
           linha: linha + 1,
-          mensagem: "Disciplinha de encontra sem o código",
+          mensagem: "Disciplina se encontra sem o código",
           valor_celular: "undefined",
           tipo_esperado: "string",
-          detalhe: "Por favor, forneça um valor"
+          detalhe: "Por favor, revise a tabela"
         }
         erros.push(newErro);
         continue;
-      } 
+      }
       /* Verificar se a coluna curso é undefined ou null */
       if (item.column5 === undefined) {
         item.column5 = "SEM TURMA"
@@ -172,77 +159,58 @@ export class EnvioIndicacaoService {
       if (item.column1.includes(' ')) {
         item.column1 = item.column1.split(' ').join('');
       }
-       /* Verifica se tem curso alocado */
-       if (item.column7 === null || item.column7 === undefined || typeof item.column7 === 'object') {
+      /* Verifica se tem curso alocado */
+      if (item.column7 === null || item.column7 === undefined || typeof item.column7 === 'object') {
         let linha = i;
         let newErro: Erro = {
           linha: linha + 1,
-          mensagem: "Coluna Curso de encontra vazia",
+          mensagem: "Coluna Curso se encontra vazia",
           valor_celular: "undefined",
           tipo_esperado: "String",
-          detalhe: "Por favor, forneça um valor"
+          detalhe: "Por favor, revise a planilha."
         }
         erros.push(newErro);
         continue;
       }
 
-
+      let semestreAtual = await this._semestre.findLatest();
       let area = await this.findArea(item);
       if (area) {
-        console.log(`Area existe: ${item.column2} turma: ${item.column5}`);
+        /*  console.log(`Area existe: ${item.column2} turma: ${item.column5}`); */
       }
       let curso = await this.findCurso(item);
       if (curso) {
-        console.log(`Curso existe: ${item.column2} turma: ${item.column5}`);
+        /*   console.log(`Curso existe: ${item.column2} turma: ${item.column5}`); */
       }
       let professor = await this.findProfessor(item);
       if (professor) {
-        console.log(`Professor existe: ${item.column2} turma: ${item.column5}`);
+        /* console.log(`Professor existe: ${item.column2} turma: ${item.column5}`); */
       }
-      let oferta = await this.findOferta(item);
+      let oferta = await this.findOferta(item, semestreAtual.id_semestre);
       if (oferta) {
-        console.log(`Oferta existe: ${item.column2} turma: ${item.column5}`);
+        /*  console.log(`Oferta existe: ${item.column2} turma: ${item.column5}`); */
       } else {
-        console.log(`Linha: ${(i + 1)} Oferta Não existe: ${item.column2} turma: ${item.column5}`);
+       /*  console.log(`Linha: ${(i + 1)} Oferta Não existe: ${item.column2} turma: ${item.column5}`); */
         let linha = i;
         let newErro: Erro = {
           linha: linha + 1,
           mensagem: "Ainda não existe oferta de disicplina para esse curso",
           valor_celular: "undefined",
           tipo_esperado: "Disciplina",
-          detalhe: "Por favor, forneça um valor"
+          detalhe: "Por favor, revise a planilha"
         }
         erros.push(newErro);
         continue;
       }
-      /* let disciplina = await this.findDisciplina(item, curso.id_curso);
-      if (disciplina) {
-        console.log(`Disciplina existe: ${item.column2} turma: ${item.column5}`);
-      }else{
-        console.log(`Disciplina Não existe: ${item.column2} turma: ${item.column5}`);
-        let linha = i;
-        let newErro: Erro = {
-          linha: linha + 1,
-          mensagem: "Ainda não existe oferta de disicplina para esse curso",
-          valor_celular: "undefined",
-          tipo_esperado: "Disciplina",
-          detalhe: "Por favor, forneça um valor"
-        }
-        erros.push(newErro);
-        continue;
-      } */
-      console.log('----------------------------------------------')
-
       if (professor && oferta) {
-        /*  console.log(`Professor: ${professor.nome_professor} | ID OFERTA: ${oferta.id_oferta}} | TURMA: ${oferta.turma}`); */
         let newAlocacao = {
           oferta_id_oferta: oferta.id_oferta,
           professor_id_professor: professor.id_professor
         }
         try {
-          await this.createAlocacao(newAlocacao, item.column5.trim());
+          let retorno = await this.createAlocacao(newAlocacao, item.column5.trim());
         } catch (error) {
-          console.log(error);
+          /* console.log(error); */
           throw new BadRequestException("Erro ao criar alocacao");
         }
       } else {
@@ -252,19 +220,16 @@ export class EnvioIndicacaoService {
           area_id_area: area.id_area,
         }
         let professor = await this.createProfessor(newProfessor);
-
-        /*  if(!oferta){continue;} */
         /* Agora eu crio a alocação! */
         let newAlocacao = {
           oferta_id_oferta: oferta.id_oferta,
           professor_id_professor: professor.id_professor
         }
 
-        await this.createAlocacao(newAlocacao, item.column5.trim());
+        let retorno = await this.createAlocacao(newAlocacao, item.column5.trim());
       }
     }
-    /* console.log("------ ERROS ----------");
-    console.log(erros); */
+
     return erros;
   }
 
@@ -279,7 +244,6 @@ export class EnvioIndicacaoService {
   }
 
   async createProfessor(newProfessor: Professor) {
-    //console.log(newProfessor);
     try {
       let retorno = await this._professor.create(newProfessor);
       /* if (!retorno) {
@@ -287,7 +251,7 @@ export class EnvioIndicacaoService {
       } */
       return retorno;
     } catch (error) {
-      console.log(error);
+    /*   console.log(error); */
       throw new BadRequestException(`Erro ao tentar criar o professor: ${newProfessor.nomeProfessor}`);
     }
   }
@@ -319,7 +283,7 @@ export class EnvioIndicacaoService {
     return retorno;
   }
 
-  async findOferta(item: any) {
+  async findOferta(item: any, id_semestre: number) {
     /* Verificar se a turma é undefined ou null */
     if (item.column5 === undefined) {
       item.column5 = "SEM TURMA"
@@ -330,7 +294,7 @@ export class EnvioIndicacaoService {
     }
     let disciplina = item.column2.trim();
     let turma = item.column5.trim();
-    let retorno = await this._oferta.findByDisciplinaAndTurma(disciplina, turma);
+    let retorno = await this._oferta.findByDisciplinaAndTurmaAndSemestre(disciplina, turma, id_semestre);
     if (retorno === null || retorno === undefined) {
       return null;
     }
