@@ -83,6 +83,15 @@ export class SemestreService {
   async remove(id: number) {
     try {
       await this.prisma.$transaction(async (prisma) =>{
+       /* Remove todas as alocações */
+       await prisma.alocacao.deleteMany({
+        where:{
+          oferta:{
+            semestre_id_semestre:id
+          }
+        }
+       });
+
         /* Remove todas as ofertas relacionadas ao semestre */
         await prisma.oferta.deleteMany({
           where:{
@@ -97,6 +106,7 @@ export class SemestreService {
         });
       });
     } catch (e) {
+      console.log(e);
       throw new NotFoundException("Erro ao deletar semestre");
     }
   }
