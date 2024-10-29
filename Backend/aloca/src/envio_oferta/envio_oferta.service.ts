@@ -91,7 +91,7 @@ export class EnvioOfertaService {
     const sheet = workbook.getWorksheet(1);
 
     // Array para armazenar os dados da planilha
-    const data = []; 
+    const data = [];
 
     sheet.eachRow((row, rowNum) => {
       // Objeto para armazenar os dados de uma linha
@@ -147,7 +147,7 @@ export class EnvioOfertaService {
           erros.push(newErro);
           continue;
         }
-        
+
         /* Verifica se a disciplina tá Qtd_créditos */
         if (item.column5 === null || item.column5 === undefined || typeof item.column5 === 'object') {
           let linha = i;
@@ -317,7 +317,7 @@ export class EnvioOfertaService {
           }
           erros.push(newErro);
           continue;
-        } 
+        }
 
         /* Verifica se a disciplina tá Qtd_créditos */
         if (item.column4 === null || item.column4 === undefined || typeof item.column4 === 'object') {
@@ -439,7 +439,7 @@ export class EnvioOfertaService {
           let retorno = await this.createDisciplina(newDisciplina);
 
           if (!retorno) {
-           /*  console.log(`erro ao salavar a disciplina ${newDisciplina.nome_disciplina}`); */
+            /*  console.log(`erro ao salavar a disciplina ${newDisciplina.nome_disciplina}`); */
           } else {
             if (item.column5 === undefined) {
               item.column5 = "SEM TURMA"
@@ -480,7 +480,7 @@ export class EnvioOfertaService {
         }
       }
     }
-   /*  console.log(erros); */
+    /*  console.log(erros); */
     return erros;
   }
 
@@ -589,6 +589,64 @@ export class EnvioOfertaService {
 
   async finOneArea(id_area: number) {
     return this._area.findOne(id_area);
+  }
+
+  async downloadAll(id_semestre: number) {
+    const workbook = new ExcelJS.Workbook();
+    const areas = await this._area.findAll();
+
+    for (const area of areas) {
+      const ofertas = await this._oferta.findByAreaAndSemestre(area.id_area, id_semestre);
+      const semestre = await this._semestre.findOne(id_semestre);
+
+      const worksheet = workbook.addWorksheet(`Indicação ${semestre.nome_semestre} - ${area.nome_area}`);
+
+      worksheet.columns = [
+        { header: 'CÓD', key: 'id', width: 10 },
+        { header: 'DISCIPLINA', key: 'disciplina', width: 50 },
+        { header: 'CH', key: 'ch', width: 10 },
+        { header: 'CHs', key: 'chs', width: 10 },
+        { header: 'TURMA', key: 'turma', width: 15 },
+        { header: 'B ou L', key: 'boul', width: 20 },
+        { header: 'CURSO', key: 'curso', width: 30 },
+        { header: 'PROFESSOR', key: 'professor', width: 60 },
+        { header: 'ÁREA', key: 'area', width: 30 },
+        { header: 'FORMANDOS', key: 'formandos', width: 30 },
+        { header: 'OBSERVAÇÕES', key: 'obs', width: 70 },
+      ];
+
+      // Estiliza cabeçalho
+      worksheet.getRow(1).eachCell((cell) => {
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FF0000FF' }
+        };
+      });
+
+      // Preenche dados
+      ofertas.forEach(oferta => {
+        worksheet.addRow({
+          id: oferta.disciplina.cod,
+          disciplina: oferta.disciplina.nome_disciplina,
+          ch: oferta.disciplina.carga_horaria,
+          chs: oferta.disciplina.qtd_creditos,
+          turma: oferta.turma,
+          boul: oferta.disciplina.curso.tipo_curso,
+          curso: oferta.disciplina.curso.nome_curso,
+          professor: " ",
+          area: oferta.disciplina.area.nome_area,
+          formandos: oferta.formandos,
+          obs: oferta.obs_colegiado,
+        });
+      });
+    }
+
+    // Retorna o buffer da planilha consolidada
+    const buffer = await workbook.xlsx.writeBuffer();
+    return buffer;
   }
 
   async download(id_area: number, id_semestre: number) {

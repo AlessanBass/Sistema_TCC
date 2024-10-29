@@ -12,18 +12,33 @@ export class EnvioIndicacaoController {
 
   @Get('downloadByColegiado/:idColegiado/:idSemestre')
   /* @Res() res: Response,   */
-  async download(@Res() res: Response, @Param('idColegiado') id_colegiado: string, @Param('idSemestre') id_semestre: string){
-    const colegiado = await this.envioIndicacaoService.findOneCurso(+id_colegiado);
-    const semestre = await this.envioIndicacaoService.finOneSemestre(+id_semestre);
-    const nomeSemestre = encodeURIComponent(semestre.nome_semestre);
-    const nomeColegiado = encodeURIComponent(colegiado.nome_curso);
-    const texto = encodeURIComponent("Envio SEI");
-    const filename = `${texto}  ${nomeSemestre} - ${nomeColegiado}.xlsx`;
+  async download(@Res() res: Response, @Param('idColegiado') id_colegiado: string, @Param('idSemestre') id_semestre: string) {
 
-    const buffer = await this.envioIndicacaoService.download(+id_colegiado, +id_semestre);
-    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${filename}`);
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.send(buffer);
+    if (+id_colegiado == 99) {
+      const buffer = await this.envioIndicacaoService.downloadAll(+id_semestre);
+      const semestre = await this.envioIndicacaoService.finOneSemestre(+id_semestre);
+      const nomeSemestre = encodeURIComponent(semestre.nome_semestre);
+      const texto = encodeURIComponent("Envio SEI");
+      const filename = `${texto} ${nomeSemestre} - Todos Colegiados.xlsx`;
+
+      res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${filename}`);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.send(buffer);
+    } else {
+      const colegiado = await this.envioIndicacaoService.findOneCurso(+id_colegiado);
+      const semestre = await this.envioIndicacaoService.finOneSemestre(+id_semestre);
+      const nomeSemestre = encodeURIComponent(semestre.nome_semestre);
+      const nomeColegiado = encodeURIComponent(colegiado.nome_curso);
+      const texto = encodeURIComponent("Envio SEI");
+      const filename = `${texto}  ${nomeSemestre} - ${nomeColegiado}.xlsx`;
+
+      const buffer = await this.envioIndicacaoService.download(+id_colegiado, +id_semestre);
+      res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${filename}`);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.send(buffer);
+    }
+
+
   }
 
   @UseInterceptors(FileInterceptor('file'))
@@ -35,8 +50,8 @@ export class EnvioIndicacaoController {
 
     const path = join(__dirname, '..', '..', 'storage', file.originalname);
     try {
-      const saveFile =  await this.envioIndicacaoService.upload(file, path);
-      if(saveFile){
+      const saveFile = await this.envioIndicacaoService.upload(file, path);
+      if (saveFile) {
         return await this.envioIndicacaoService.readExecel(file, path);
       }
     } catch (error) {

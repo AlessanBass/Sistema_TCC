@@ -109,11 +109,12 @@ export default function Index() {
                     <select name="selecao" id="selecao" onChange={handleOptionChange} className={styleGenerate.select}>
                         <option value="0" className={styleGenerate.option}>Selecione uma opção</option>
                         <option value="1" className={styleGenerate.option}>Gerar Planilha Com As Ofertas</option>
-                        <option value="2" className={styleGenerate.option}>Gerar Planilha Para Envio Sei</option>
+                        <option value="2" className={styleGenerate.option}>Gerar Planilha Para Envio Colegiado</option>
                     </select>
 
                     <select name="selecaoArea" id="selecaoArea" onChange={handleAreaChange} className={styleGenerate.select}>
                         <option value="0" className={styleGenerate.option}>Selecione uma área</option>
+                        <option  value={99} className={styleGenerate.option}>Gerar Planilhas de Todas as Áreas</option>
                         {areas?.map((area: Area) => (
                             <option key={area.id_area} value={area.id_area} className={styleGenerate.option}>
                                 {area.nome_area}

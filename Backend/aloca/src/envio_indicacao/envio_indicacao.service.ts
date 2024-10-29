@@ -114,9 +114,9 @@ export class EnvioIndicacaoService {
     /* Jogar essa isso de apagar em uma função */
     try {
       await unlink(path);
-    /*   console.log('Arquivo excluído com sucesso'); */
+      /*   console.log('Arquivo excluído com sucesso'); */
     } catch (error) {
-     /*  console.error('Erro ao excluir o arquivo:', error); */
+      /*  console.error('Erro ao excluir o arquivo:', error); */
     }
 
     // Retornar os erros encontrados
@@ -129,7 +129,7 @@ export class EnvioIndicacaoService {
 
     for (let i = 1; i < data.length; i++) {
       const item = data[i];
-      
+
       if ((item.column1 === undefined || typeof item.column1 === 'object') && (item.column2 === undefined || typeof item.column2 === 'object')) {
         continue;
       }
@@ -190,7 +190,7 @@ export class EnvioIndicacaoService {
       if (oferta) {
         /*  console.log(`Oferta existe: ${item.column2} turma: ${item.column5}`); */
       } else {
-       /*  console.log(`Linha: ${(i + 1)} Oferta Não existe: ${item.column2} turma: ${item.column5}`); */
+        /*  console.log(`Linha: ${(i + 1)} Oferta Não existe: ${item.column2} turma: ${item.column5}`); */
         let linha = i;
         let newErro: Erro = {
           linha: linha + 1,
@@ -251,7 +251,7 @@ export class EnvioIndicacaoService {
       } */
       return retorno;
     } catch (error) {
-    /*   console.log(error); */
+      /*   console.log(error); */
       throw new BadRequestException(`Erro ao tentar criar o professor: ${newProfessor.nomeProfessor}`);
     }
   }
@@ -337,6 +337,66 @@ export class EnvioIndicacaoService {
         return curso[0];
       }
     }
+  }
+
+  async downloadAll(id_semestre: number) {
+    const workbook = new ExcelJS.Workbook();
+    const colegiados = await this._curso.findAll();
+
+    for (const colegiado of colegiados) {
+      const semestre = await this._semestre.findOne(id_semestre);
+      const alocacoes = await this._alocacao.findByColegiadoBySemestre(colegiado.id_curso, semestre.id_semestre);
+
+      const worksheet = workbook.addWorksheet(`Indicação ${semestre.nome_semestre} - ${colegiado.nome_curso}`);
+
+      /* Adicionar cabeçalhos na minha tabela */
+      let headers = [
+        { header: 'CÓD', key: 'id', width: 10 },
+        { header: 'DISCIPLINA', key: 'disciplina', width: 50 },
+        { header: 'CH', key: 'ch', width: 10 },
+        { header: 'CHs', key: 'chs', width: 10 },
+        { header: 'TURMA', key: 'turma', width: 10 },
+        { header: 'B ou L', key: 'boul', width: 20 },
+        { header: 'CURSO', key: 'curso', width: 30 },
+        { header: 'PROFESSOR', key: 'professor', width: 60 },
+        { header: 'ÁREA', key: 'area', width: 30 },
+        { header: 'FORMANDOS', key: 'formandos', width: 30 },
+        { header: 'OBSERVAÇÕES', key: 'obs', width: 70 },
+      ];
+
+      worksheet.columns = headers;
+
+      /* Aplicando estilo */
+      worksheet.getRow(1).eachCell((cell) => {
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }; // Cor da fonte branca
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FF0000FF' } // Cor de fundo azul
+        };
+      });
+
+      alocacoes.forEach(alocacao => {
+        worksheet.addRow({
+          id: alocacao.oferta.disciplina.cod,
+          disciplina: alocacao.oferta.disciplina.nome_disciplina,
+          ch: alocacao.oferta.disciplina.carga_horaria,
+          chs: alocacao.oferta.disciplina.qtd_creditos,
+          turma: alocacao.oferta.turma,
+          boul: alocacao.oferta.disciplina.curso.tipo_curso,
+          curso: alocacao.oferta.disciplina.curso.nome_curso,
+          professor: alocacao.professor.nome_professor,
+          area: alocacao.oferta.area.nome_area,
+          formandos: alocacao.oferta.formandos,
+          obs: alocacao.oferta.obs_colegiado,
+        });
+      });
+
+    }
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    return buffer;
   }
 
   async download(id_colegiado: number, id_semestre: number) {
