@@ -8,7 +8,7 @@ export default function Footer(){
         <div className={`${styleFooter.divFooter}`}>
             <div className={`${styleFooter.containerLogoGif}`}>
                 <Image className={`${styleFooter.gif}`} src={myGif} alt="Gif Aloca Macth"></Image>
-                <p className={`${styleFooter.pFooter}`}>Ferramenta de Alocação de Disciplinas</p>
+                <p className={`${styleFooter.pFooter}`}>Sistema de Suporte ao Processo de Alocação de Disciplinas</p>
             </div>
 
             <div className={`${styleFooter.containerInfoUesc}`}>

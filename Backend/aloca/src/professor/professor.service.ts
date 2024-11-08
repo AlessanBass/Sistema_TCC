@@ -198,4 +198,59 @@ export class ProfessorService {
     }
   }
 
+  async findByNameAndSemester(idProfessor: number, semestre: number){
+    try {
+      const professor = await this.prisma.professor.findFirst({
+        where: {
+          id_professor: idProfessor,
+        },
+        include: {
+          alocacao: {
+            include: {
+              oferta: {
+                include: {
+                  disciplina: true,
+                  semestre: true,
+                },
+              },
+            },
+          },
+        },
+      });
+    
+      // Filtra as alocações para manter apenas as disciplinas do semestre especificado
+      if (professor) {
+        professor.alocacao = professor.alocacao.filter(
+          (alocacao) => alocacao.oferta.semestre.id_semestre === semestre
+        );
+      }
+
+      if (!professor) {
+        throw new NotFoundException(`Professor com ID ${idProfessor} não encontrado`);
+      }
+
+       // Calcula a carga horária total das disciplinas alocadas no semestre específico
+       const totalHoras = professor.alocacao.reduce((acc, alocacao) => {
+        // Verifica se a alocação é para o semestre específico
+        if (alocacao.oferta.semestre.id_semestre === semestre) {
+          // Adiciona a carga horária da disciplina alocada
+          return acc + (alocacao.oferta.disciplina.carga_horaria || 0);
+        }
+        return acc;
+      }, 0);
+      
+      // Divide a carga horária total por 15 para obter as horas semanais
+      // Divide a carga horária total por 15 para obter as horas semanais
+    const horasSemana = totalHoras / 15;
+
+    return {
+      professor,
+      horasSemana
+    };
+      
+    } catch (error) {
+      throw new BadRequestException("Erro ao procurar o professor");
+    }
+  }
+
 }

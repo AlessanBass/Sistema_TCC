@@ -139,11 +139,13 @@ export default function ModalCursoCreate() {
                                     onChange={handleTipoCursoChange}
                                 />
 
-                                <Button variant="contained" color="primary" onClick={handleSubmit}>
-                                    Cadastrar
-                                </Button>
+                               
 
                             </Box>
+                            <Button variant="contained" color="primary" onClick={handleSubmit}>
+                                    Cadastrar
+                            </Button>
+                            
                             <Button variant="contained" color="error" onClick={handleClose}>
                                 Fechar
                             </Button>

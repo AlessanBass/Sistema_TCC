@@ -119,11 +119,11 @@ export default function ModalSemestreCreate() {
                                     value={nomeSemestre}
                                     onChange={handleNomeSemestreChange}
                                 />
-                                <Button variant="contained" color="primary" onClick={handleSubmit}>
+                               
+                            </Box>
+                            <Button variant="contained" color="primary" onClick={handleSubmit}>
                                     Cadastrar
                                 </Button>
-
-                            </Box>
                             <Button variant="contained" color="error" onClick={handleClose}>
                                 Fechar
                             </Button>

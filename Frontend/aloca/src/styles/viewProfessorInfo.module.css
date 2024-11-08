@@ -37,3 +37,28 @@
 .infoSemDisciplina{
     text-align: center;
 }
+
+.selectInProfessores{
+    font-size: 1em;
+    padding: 10px;
+    border: 1px solid #007BFF;
+    border-radius: 4px;
+    width: 40%;
+    -webkit-appearance: none;
+    cursor: pointer;
+    font-weight: 500;
+    /* background-color: #09456c;
+    color: white; */
+    /* Remove o estilo padrão do select em alguns navegadores */
+    -moz-appearance: none;
+    /* Remove o estilo padrão do select em alguns navegadores */
+    appearance: none;
+    /* Remove o estilo padrão do select em alguns navegadores */
+}
+
+.divSelectSemestre{
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

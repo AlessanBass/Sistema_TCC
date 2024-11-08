@@ -37,6 +37,7 @@ interface Alocacao {
     oferta_id_oferta: number;
     professor_id_professor: number;
     oferta: Oferta;
+    cargaHorariaTotal?: number;
 }
 
 interface Area {
@@ -55,6 +56,7 @@ interface Professor {
 
 interface propsModal{
     professores : Professor;
+    carga_horaria: number | null;
 }
 
 /* 
@@ -62,7 +64,7 @@ interface propsModal{
     2° Fazer o OverFlow, pois a tabela pode crescer
 */
 
-export default function TableViewProfessor({professores} :propsModal) {
+export default function TableViewProfessor({professores, carga_horaria} :propsModal) {
     return (
         <TableContainer>
             <Table>
@@ -89,6 +91,10 @@ export default function TableViewProfessor({professores} :propsModal) {
                         ))}
                 </TableBody>
             </Table>
+            <div className={`${styles.divCargaHoraria}`}>
+                 <p className={`${styles.pCargaHoraria}`}>Carga Horária: <span className={`${styles.spanCargaHoraria}`}>{carga_horaria}h</span></p>
+            </div>
+            
         </TableContainer>
     );
 }

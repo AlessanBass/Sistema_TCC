@@ -129,12 +129,26 @@ export class EnvioOfertaService {
     if (data[0].column1.trim().toUpperCase() === "PERÍODO") {
       for (let i = 1; i < data.length; i++) {
         const item = data[i];
+        /*Verifica se a planilha está vazia*/
+        if(item.column2 === 0 && item.column4 === 0 && item.column5 === 0 && item.column6 === 0 && item.column7 === 0 && item.column8 === 0 && item.column9 === 0 && item.column10 === 0 && item.column11 === 0){
+          let linha = i;
+          let newErro: Erro = {
+            linha: linha + 1,
+            mensagem: "Tabela vazia",
+            valor_celular: "undefined",
+            tipo_esperado: "string",
+            detalhe: "Por favor, revise a planilha"
+          }
+          erros.push(newErro);
+          return;
+        }
+
         /* Preciso tratar tbm linhas apenas com dados como total de créditos */
         if ((item.column2 === undefined || typeof item.column2 === 'object') && (item.column3 === undefined || typeof item.column3 === 'object')) {
           continue;
         }
         /* Verifica disciplinas que estão sem código */
-        if (item.column2 === null || item.column2 === undefined || typeof item.column2 === 'object') {
+        if (item.column2 === 0 ||item.column2 === null || item.column2 === undefined || typeof item.column2 === 'object') {
           /* Retornoar um erro no array */
           let linha = i;
           let newErro: Erro = {
