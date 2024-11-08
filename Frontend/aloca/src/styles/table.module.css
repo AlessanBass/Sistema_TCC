@@ -59,3 +59,17 @@
 .iconsTrash{
     color: red;
 }
+
+.pCargaHoraria{
+    font-weight: bold;
+    color: rgb(8, 68, 117);
+    
+}
+
+.divCargaHoraria{
+    padding: 5px;
+}
+
+.spanCargaHoraria{
+    color: red;
+}

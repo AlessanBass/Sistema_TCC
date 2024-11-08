@@ -76,7 +76,9 @@ export default function TableProfessor({professores}: propsTable) {
                     </TableRow> 
                 </TableHead>
                 <TableBody>
-                    {professores && professores.map((professor) =>(
+                    {professores && professores
+                    .filter((professor) => professor.id_professor !== 1) 
+                    .map((professor) =>(
                         <TableRow key={professor.id_professor} className={`${styles.tableRow}`} >
                             <TableCell sx={{ fontFamily: '"Oswald", sans-serif', fontSize:'1em'  }}>{professor.nome_professor}</TableCell>
                             <TableCell sx={{ fontFamily: '"Oswald", sans-serif', fontSize:'1em' }}>{professor.observacoes}</TableCell>

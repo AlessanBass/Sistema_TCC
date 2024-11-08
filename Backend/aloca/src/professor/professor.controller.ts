@@ -34,6 +34,11 @@ export class ProfessorController {
     return this.professorService.findByName(name);
   }
 
+  @Get('name/:idProfessor/:semestre')
+  async findByNameAndSemester(@Param('idProfessor') idProfessor: string, @Param('semestre') semestre: string){
+    return this.professorService.findByNameAndSemester(+idProfessor, +semestre);
+  }
+
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateProfessorDto: UpdateProfessorDto) {
     return this.professorService.update(+id, updateProfessorDto);

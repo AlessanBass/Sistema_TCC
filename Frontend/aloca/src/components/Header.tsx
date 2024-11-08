@@ -13,7 +13,7 @@ export default function Header(props : HeaderProps){
             <Head> 
                 <title>{props.title}</title>
             </Head>
-            <header >
+            <header className={`${styles.headerNav}`}>
                 <Link href={"/"}>
                     <Image
                         alt="Logo Aplicação"
@@ -22,6 +22,11 @@ export default function Header(props : HeaderProps){
                         height={200}
                         className={`${styles.logoHeader}`}
                     />
+                </Link>
+
+                <Link href={"https://www.youtube.com/playlist?list=PLaSARLycBs8XNLf2K450mjPWBX0zoEIZp"} target="_blank" className={`${styles.divTutorial}`}>
+                    <i className={`fa-brands fa-youtube ${styles.icondivTutorial}`}></i>
+                    <p className={`${styles.pdivTutorial}`}>Assistir Tutoriais</p>
                 </Link>
             </header>
         </div>
